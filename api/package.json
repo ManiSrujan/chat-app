@@ -1,10 +1,10 @@
 {
   "name": "chat-app",
   "version": "1.0.0",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "nodemon src/server.js"
   },
   "keywords": [],
   "author": "",
