@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
-import { createUser, getUser } from "./db/user.js";
+import { createUser, getUser } from "../db/user.js";
+import jwt from "jsonwebtoken";
 
 async function signUp(username, firstname, lastname, password) {
   try {
@@ -37,4 +38,17 @@ async function verifyPassword(username, password) {
   }
 }
 
-export { signUp, verifyPassword };
+async function generateJWTToken(username, password, secret, expiresIn) {
+  if (expiresIn) {
+    const token = jwt.sign({ username, password }, secret, { expiresIn });
+    return token;
+  }
+  const token = jwt.sign({ username, password }, secret);
+  return token;
+}
+
+async function verifyJWTToken(token, secret) {
+  return jwt.verify(token, secret);
+}
+
+export { signUp, verifyPassword, generateJWTToken, verifyJWTToken };
