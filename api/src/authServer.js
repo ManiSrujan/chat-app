@@ -4,10 +4,10 @@ import {
   signUp,
   verifyJWTToken,
   verifyPassword,
-} from "./auth/index.js";
+} from "./utils/auth.js";
 import dotenv from "dotenv";
-import { getErrorMessage } from "./utils.js";
 import { addTokenToDb, isTokenInDb } from "./db/refreshToken.js";
+import { getErrorMessage } from "./utils/utils.js";
 
 dotenv.config();
 const app = express();

@@ -1,8 +1,8 @@
 import express from "express";
 import { getAllUsers } from "./db/user.js";
 import dotenv from "dotenv";
-import { getErrorMessage } from "./utils.js";
-import { verifyJWTToken } from "./auth/index.js";
+import { getErrorMessage } from "./utils/utils.js";
+import { verifyJWTToken } from "./utils/auth.js";
 
 dotenv.config();
 const app = express();
