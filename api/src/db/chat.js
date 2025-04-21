@@ -1,4 +1,5 @@
 import pg from "pg";
+import { ERROR_MESSAGES } from "../constants.js";
 
 const { Client } = pg;
 
@@ -66,7 +67,7 @@ async function deleteChat(chatId) {
     ]);
 
     if (!result.rowCount) {
-      throw new Error("chat doesnt exist");
+      throw new Error(ERROR_MESSAGES.ChatDoesntExist);
     }
   } finally {
     await client.end();

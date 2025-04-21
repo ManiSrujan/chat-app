@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { getErrorMessage } from "./utils/utils.js";
 import { verifyJWTToken } from "./utils/auth.js";
 import { createChat, deleteChat, getChats } from "./db/chat.js";
+import { ERROR_MESSAGES } from "./constants.js";
 
 dotenv.config();
 const app = express();
@@ -51,7 +52,7 @@ app.delete("/chat/:id", verifyToken, async function handleChatDelete(req, res) {
     res.sendStatus(200);
   } catch (error) {
     res
-      .status(error.message === "chat doesnt exist" ? 404 : 500)
+      .status(error.message === ERROR_MESSAGES.ChatDoesntExist ? 404 : 500)
       .send({ message: getErrorMessage(error) });
   }
 });

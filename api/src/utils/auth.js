@@ -1,12 +1,13 @@
 import bcrypt from "bcrypt";
 import { createUser, getUser } from "../db/user.js";
 import jwt from "jsonwebtoken";
+import { ERROR_MESSAGES } from "../constants.js";
 
 async function signUp(username, firstname, lastname, password) {
   try {
     // check if username already exists
     if ((await getUser(username)).length) {
-      throw new Error("username already exists");
+      throw new Error(ERROR_MESSAGES.UserNameExists);
     }
 
     // hash password
@@ -31,7 +32,7 @@ async function verifyPassword(username, password) {
     );
 
     if (!isCorrectPass) {
-      throw new Error("wrong password");
+      throw new Error(ERROR_MESSAGES.WrongPassword);
     }
   } catch (error) {
     throw error;
