@@ -1,17 +1,5 @@
-import pg from "pg";
 import { ERROR_MESSAGES } from "../constants.js";
-
-const { Client } = pg;
-
-function createClient() {
-  return new Client({
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_DATABASE,
-  });
-}
+import { createClient } from "../utils/db.js";
 
 async function createChat(userId1, userId2) {
   const client = createClient();

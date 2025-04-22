@@ -1,20 +1,7 @@
-import pg from "pg";
 import dotenv from "dotenv";
+import { createClient } from "../utils/db.js";
 
 dotenv.config();
-const { Client } = pg;
-
-function createClient() {
-  const client = new Client({
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_DATABASE,
-  });
-
-  return client;
-}
 
 async function createUser(username, firstname, lastname, password) {
   const client = createClient();

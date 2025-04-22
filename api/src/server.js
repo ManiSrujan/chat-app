@@ -5,6 +5,12 @@ import { getErrorMessage } from "./utils/utils.js";
 import { verifyJWTToken } from "./utils/auth.js";
 import { createChat, deleteChat, getChats } from "./db/chat.js";
 import { ERROR_MESSAGES } from "./constants.js";
+import {
+  createMessage,
+  deleteMessage,
+  getAllMessage,
+  updateMessage,
+} from "./db/message.js";
 
 dotenv.config();
 const app = express();
@@ -49,7 +55,7 @@ app.delete("/chat/:id", verifyToken, async function handleChatDelete(req, res) {
   try {
     const { id } = req.params;
     await deleteChat(id);
-    res.sendStatus(200);
+    res.sendStatus(204);
   } catch (error) {
     res
       .status(error.message === ERROR_MESSAGES.ChatDoesntExist ? 404 : 500)
@@ -66,5 +72,70 @@ app.get("/chat/user/:id", verifyToken, async function handleGetChats(req, res) {
     res.status(500).send({ message: getErrorMessage(error) });
   }
 });
+
+app.post("/message", verifyToken, async function handleCreateMessage(req, res) {
+  try {
+    const { userId, chatId, message } = req.body;
+
+    const result = await createMessage(chatId, userId, message);
+    res.status(201).send(result);
+  } catch (error) {
+    res.status(500).send({ message: getErrorMessage(error) });
+  }
+});
+
+app.patch(
+  "/message/:id",
+  verifyToken,
+  async function handleUpdateMessage(req, res) {
+    try {
+      const { id } = req.params;
+      const { message } = req.body;
+
+      await updateMessage(id, message);
+      res.sendStatus(204);
+    } catch (error) {
+      res
+        .status(error.message === ERROR_MESSAGES.NoMessage ? 404 : 500)
+        .send({ message: getErrorMessage(error) });
+    }
+  },
+);
+
+app.delete(
+  "/message/:id",
+  verifyToken,
+  async function handleMessageDelete(req, res) {
+    try {
+      const { id } = req.params;
+
+      await deleteMessage(id);
+      res.sendStatus(204);
+    } catch (error) {
+      res
+        .status(error.message === ERROR_MESSAGES.NoMessage ? 404 : 500)
+        .send({ message: getErrorMessage(error) });
+    }
+  },
+);
+
+app.get(
+  "/message/chat/:id",
+  verifyToken,
+  async function handleGetAllMessages(req, res) {
+    try {
+      const { id, sortDir } = req.params;
+
+      if (sortDir && (sortDir !== "asc" || sortDir !== "desc")) {
+        throw new Error("sortDir isnt valid value");
+      }
+
+      const messages = await getAllMessage(id, sortDir);
+      res.status(200).send({ messages });
+    } catch (error) {
+      res.status(500).send({ message: getErrorMessage(error) });
+    }
+  },
+);
 
 app.listen(process.env.API_PORT);
