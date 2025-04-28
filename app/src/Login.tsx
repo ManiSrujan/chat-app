@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import axios from "axios";
 import getApiDomain from "./utils/apiDomain";
@@ -14,10 +14,19 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (accessToken && refreshToken) {
+      setLoc("/chat"); // Redirect to chat page if tokens are available
+    }
+  }, []);
+
   const handleLogin = async () => {
     try {
       const response = await axios.post<LoginResponse>(
-        `${getApiDomain()}/auth/login`,
+        `${getApiDomain().AUTH}/auth/login`,
         {
           username,
           password,

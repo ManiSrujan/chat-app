@@ -50,7 +50,9 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
-        // Optionally, handle logout or redirect to login page
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "/"; // Redirect to login page
         return Promise.reject(refreshError);
       }
     }
