@@ -1,16 +1,40 @@
-import { useState } from 'react';
-import { useLocation } from 'wouter';
-import styles from './login.module.css';
+import { useState } from "react";
+import { useLocation } from "wouter";
+import axios from "axios";
+import getApiDomain from "./utils/apiDomain";
+import styles from "./login.module.css";
+
+interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+}
 
 const Login = () => {
   const [, setLoc] = useLocation();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    // Placeholder for login logic
-    console.log('Logging in with', username, password);
-    setLoc('/chat'); // Redirect to chat page after login
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post<LoginResponse>(
+        `${getApiDomain()}/auth/login`,
+        {
+          username,
+          password,
+        },
+      );
+      const { accessToken, refreshToken } = response.data;
+
+      // Store tokens in localStorage
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+
+      console.log("Login successful:", response.data);
+      setLoc("/chat"); // Redirect to chat page after login
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Login failed. Please check your username and password.");
+    }
   };
 
   return (
@@ -31,7 +55,9 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           className={styles.input}
         />
-        <button onClick={handleLogin} className={styles.button}>Login</button>
+        <button onClick={handleLogin} className={styles.button}>
+          Login
+        </button>
       </div>
     </div>
   );
