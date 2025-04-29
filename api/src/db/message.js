@@ -64,8 +64,10 @@ async function getAllMessage(chatId, sortDir = "asc") {
     await client.connect();
 
     const result = await client.query(
-      "SELECT message_id, user_id, content, created_at FROM message WHERE chat_id = $1 ORDER BY $2",
-      [chatId, sortDir],
+      `SELECT message_id, message.user_id, user_name, content, created_at 
+      FROM message JOIN appuser ON message.user_id = appuser.user_id 
+      WHERE chat_id = $1 ORDER BY message.created_at ${sortDir}`,
+      [chatId],
     );
 
     return result.rows ?? [];
