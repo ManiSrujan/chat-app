@@ -1,13 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./chat.module.css";
+import { ENV_CONFIG_KEY } from "../../common/env-config/constants";
+import { getEnvConfig } from "../../common/env-config/envConfig";
+import restClient from "../../common/rest-client/restClient";
 
-const Chat = () => {
-  const [messages, setMessages] = useState<string[]>([]);
+// TEMPORARY
+const CHAT_ID = "7d133660-fc23-4dec-96d6-3097409be2da";
+
+const Chat = (): JSX.Element => {
+  const [messages, setMessages] = useState<IMessage[]>([]);
   const [input, setInput] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await restClient.get(
+          `${getEnvConfig(ENV_CONFIG_KEY.API)}/message/chat/${CHAT_ID}`,
+        );
+        setMessages(response.data.messages);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    })();
+  }, []);
 
   const handleSend = () => {
     if (input.trim()) {
-      setMessages([...messages, input]);
       setInput("");
     }
   };
@@ -17,7 +35,7 @@ const Chat = () => {
       <div className={styles.messagesContainer}>
         {messages.map((message, index) => (
           <div key={index} className={styles.message}>
-            {message}
+            {message.user_name}: {message.content} <br />
           </div>
         ))}
       </div>
