@@ -1,6 +1,6 @@
 import { Route, Switch } from "wouter";
-import Login from "./Login";
-import Chat from "./Chat";
+import Chat from "./apps/chat/Chat";
+import Login from "./apps/login/Login";
 
 const App = () => {
   return (
