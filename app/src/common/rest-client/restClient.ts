@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ENV_CONFIG_KEY } from "../env-config/constants";
+import { getEnvConfig } from "../env-config/envConfig";
 
 const restClient = axios.create();
 
@@ -25,7 +26,7 @@ restClient.interceptors.response.use(
     const originalRequest = error.config;
     if (
       error.response &&
-      error.response.status === 401 &&
+      (error.response.status === 401 || error.response.status === 403) &&
       !originalRequest._retry
     ) {
       originalRequest._retry = true;

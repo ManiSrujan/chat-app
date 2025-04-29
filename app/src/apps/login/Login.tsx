@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import axios from "axios";
 import styles from "./login.module.css";
-import { ENV_CONFIG_KEY } from "./common/env-config/constants";
+import { ENV_CONFIG_KEY } from "../../common/env-config/constants";
+import { getEnvConfig } from "../../common/env-config/envConfig";
 
 interface LoginResponse {
   accessToken: string;
