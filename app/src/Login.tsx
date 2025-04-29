@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import axios from "axios";
-import getApiDomain from "./utils/apiDomain";
 import styles from "./login.module.css";
+import { ENV_CONFIG_KEY } from "./common/env-config/constants";
 
 interface LoginResponse {
   accessToken: string;
@@ -26,7 +26,7 @@ const Login = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post<LoginResponse>(
-        `${getApiDomain().AUTH}/auth/login`,
+        `${getEnvConfig(ENV_CONFIG_KEY.AUTH)}/auth/login`,
         {
           username,
           password,

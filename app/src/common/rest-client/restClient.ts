@@ -1,10 +1,10 @@
 import axios from "axios";
-import getApiDomain from "./apiDomain";
+import { ENV_CONFIG_KEY } from "../env-config/constants";
 
-const apiClient = axios.create();
+const restClient = axios.create();
 
 // Add a request interceptor to include the accessToken in the Authorization header
-apiClient.interceptors.request.use(
+restClient.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
@@ -19,7 +19,7 @@ apiClient.interceptors.request.use(
 );
 
 // Add a response interceptor to handle token refresh
-apiClient.interceptors.response.use(
+restClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
@@ -36,7 +36,7 @@ apiClient.interceptors.response.use(
         }
 
         const refreshResponse = await axios.post(
-          `${getApiDomain().AUTH}/auth/refresh`,
+          `${getEnvConfig(ENV_CONFIG_KEY.AUTH)}/auth/refresh`,
           {
             refreshToken,
           },
@@ -47,7 +47,7 @@ apiClient.interceptors.response.use(
 
         // Update the Authorization header and retry the original request
         originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
-        return apiClient(originalRequest);
+        return restClient(originalRequest);
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
         localStorage.removeItem("accessToken");
@@ -60,4 +60,4 @@ apiClient.interceptors.response.use(
   },
 );
 
-export default apiClient;
+export default restClient;
