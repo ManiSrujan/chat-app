@@ -8,6 +8,7 @@ import { getEnvConfig } from "../../common/env-config/envConfig";
 interface LoginResponse {
   accessToken: string;
   refreshToken: string;
+  userId: string;
 }
 
 const Login = () => {
@@ -33,11 +34,12 @@ const Login = () => {
           password,
         },
       );
-      const { accessToken, refreshToken } = response.data;
+      const { accessToken, refreshToken, userId } = response.data;
 
       // Store tokens in localStorage
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("userId", userId);
 
       console.log("Login successful:", response.data);
       setLoc("/chat"); // Redirect to chat page after login
