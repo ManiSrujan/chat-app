@@ -9,6 +9,7 @@ interface LoginResponse {
   accessToken: string;
   refreshToken: string;
   userId: string;
+  userName: string;
 }
 
 const Login = () => {
@@ -34,12 +35,13 @@ const Login = () => {
           password,
         },
       );
-      const { accessToken, refreshToken, userId } = response.data;
+      const { accessToken, refreshToken, userId, userName } = response.data;
 
       // Store tokens in localStorage
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("userId", userId);
+      localStorage.setItem("userName", userName);
 
       console.log("Login successful:", response.data);
       setLoc("/chat"); // Redirect to chat page after login
