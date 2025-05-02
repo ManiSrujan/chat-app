@@ -8,11 +8,17 @@ import {
 import dotenv from "dotenv";
 import { addTokenToDb, isTokenInDb } from "./db/refreshToken.js";
 import { getErrorMessage } from "./utils/utils.js";
+import cors from "cors";
 import { getUser } from "./db/user.js";
 
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(
+  cors({
+    origin: process.env.WEBSOCKET_ALLOWED_ORIGIN,
+  }),
+);
 
 app.post("/auth/login", async function loginUser(req, res) {
   try {
@@ -40,7 +46,12 @@ app.post("/auth/login", async function loginUser(req, res) {
     await addTokenToDb(refreshToken);
     const userDetails = await getUser(username);
 
-    res.json({ accessToken, refreshToken, userId: userDetails[0].user_id });
+    res.json({
+      accessToken,
+      refreshToken,
+      userId: userDetails[0].user_id,
+      userName: userDetails[0].user_name,
+    });
   } catch (error) {
     res.status(500).send({ message: getErrorMessage(error) });
   }

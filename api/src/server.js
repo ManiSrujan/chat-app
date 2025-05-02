@@ -1,9 +1,11 @@
 import express from "express";
-import { getAllUsers } from "./db/user.js";
+import { getAllUsers, getUserById } from "./db/user.js";
 import dotenv from "dotenv";
 import { getErrorMessage } from "./utils/utils.js";
 import { verifyJWTToken } from "./utils/auth.js";
-import { createChat, deleteChat, getChats } from "./db/chat.js";
+import http from "http";
+import websocket from "websocket";
+import { createChat, deleteChat, getChats, getUsersOfChat } from "./db/chat.js";
 import { ERROR_MESSAGES } from "./constants.js";
 import {
   createMessage,
@@ -11,10 +13,83 @@ import {
   getAllMessage,
   updateMessage,
 } from "./db/message.js";
+import cors from "cors";
 
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(
+  cors({
+    origin: process.env.WEBSOCKET_ALLOWED_ORIGIN,
+  }),
+);
+
+const server = http.createServer(app);
+const WebSocketServer = websocket.server;
+const wsServer = new WebSocketServer({
+  httpServer: server,
+});
+const webSocketConnections = {};
+
+wsServer.on("request", function handleWSRequest(request) {
+  if (request.origin !== process.env.WEBSOCKET_ALLOWED_ORIGIN) {
+    console.log("Origin not allowed:", request.origin);
+    request.reject(403, "Origin not allowed");
+    return;
+  }
+
+  const connection = request.accept("chat", request.origin);
+
+  connection.on("close", function handleClose(reasonCode, description) {
+    console.log("Client has disconnected:", reasonCode, description);
+    Object.keys(webSocketConnections).forEach((userId) => {
+      if (!webSocketConnections[userId].connected) {
+        delete webSocketConnections[userId];
+      }
+    });
+  });
+
+  connection.on("message", async function handleMessage(message) {
+    if (message.type === "utf8") {
+      const parsedMessage = JSON.parse(message.utf8Data);
+      const { type, data } = parsedMessage;
+
+      switch (type) {
+        case "connect":
+          webSocketConnections[data["userId"]] = connection;
+          break;
+        case "disconnect":
+          delete webSocketConnections[data["userId"]];
+          break;
+        case "message":
+          const { srcUserId, chatId, message } = data;
+          const usersOfChat = await getUsersOfChat(chatId);
+          const targetUserId = usersOfChat.find(
+            (user) => user.user_id !== srcUserId,
+          ).user_id;
+          const response = await createMessage(chatId, srcUserId, message);
+          const srcUserName = (await getUserById(srcUserId))[0].user_name;
+          const targetUserConnection = webSocketConnections[targetUserId];
+
+          if (targetUserConnection && targetUserConnection.connected) {
+            targetUserConnection.sendUTF(
+              JSON.stringify({
+                type: "message",
+                data: {
+                  content: message,
+                  created_at: response.created_at,
+                  message_id: response.message_id,
+                  user_id: response.user_id,
+                  user_name: srcUserName,
+                },
+              }),
+            );
+          }
+          break;
+      }
+    }
+  });
+});
 
 async function verifyToken(req, res, next) {
   try {
@@ -138,4 +213,4 @@ app.get(
   },
 );
 
-app.listen(process.env.API_PORT);
+server.listen(process.env.API_PORT);

@@ -79,4 +79,25 @@ async function getChats(userId) {
   }
 }
 
-export { createChat, deleteChat, getChats };
+async function getUsersOfChat(chatId) {
+  const client = createClient();
+
+  try {
+    await client.connect();
+
+    const result = await client.query(
+      "SELECT chat_id, user_id FROM user_chat WHERE chat_id = $1",
+      [chatId],
+    );
+
+    if (!result.rowCount) {
+      throw new Error(ERROR_MESSAGES.ChatDoesntExist);
+    }
+
+    return result.rows;
+  } finally {
+    await client.end();
+  }
+}
+
+export { createChat, deleteChat, getChats, getUsersOfChat };

@@ -57,4 +57,23 @@ async function getUser(username) {
   }
 }
 
-export { createUser, getAllUsers, getUser };
+async function getUserById(userId) {
+  const client = createClient();
+
+  try {
+    await client.connect();
+
+    const result = await client.query(
+      "SELECT * FROM appuser WHERE user_id=$1",
+      [userId],
+    );
+
+    return result.rows;
+  } catch (error) {
+    throw error;
+  } finally {
+    await client.end();
+  }
+}
+
+export { createUser, getAllUsers, getUser, getUserById };
