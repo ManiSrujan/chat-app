@@ -37,7 +37,7 @@ restClient.interceptors.response.use(
         }
 
         const refreshResponse = await axios.post(
-          `${getEnvConfig(ENV_CONFIG_KEY.AUTH)}/auth/refresh`,
+          `${getEnvConfig(ENV_CONFIG_KEY.API)}/auth/refresh`,
           {
             refreshToken,
           },

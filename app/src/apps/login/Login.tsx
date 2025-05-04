@@ -29,7 +29,7 @@ const Login = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post<LoginResponse>(
-        `${getEnvConfig(ENV_CONFIG_KEY.AUTH)}/auth/login`,
+        `${getEnvConfig(ENV_CONFIG_KEY.API)}/auth/login`,
         {
           username,
           password,
