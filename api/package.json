@@ -4,8 +4,7 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon src/server.js",
-    "start-auth": "nodemon src/authServer.js"
+    "start": "nodemon src/server.js"
   },
   "keywords": [],
   "author": "",
