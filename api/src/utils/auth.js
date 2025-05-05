@@ -25,6 +25,10 @@ async function verifyPassword(username, password) {
     // get user from db
     const user = await getUser(username);
 
+    if (!user.length) {
+      throw new Error(ERROR_MESSAGES.UserNotFound);
+    }
+
     // compare password with hashed password
     const isCorrectPass = await bcrypt.compare(
       password,

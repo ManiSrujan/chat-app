@@ -3,6 +3,7 @@ const ERROR_MESSAGES = {
   UserNameExists: "username already exists",
   WrongPassword: "wrong password",
   NoMessage: "message doesnt exist",
+  UserNotFound: "user not found",
 };
 
 export { ERROR_MESSAGES };
