@@ -292,4 +292,6 @@ app.post("/auth/refresh", async function refreshUserToken(req, res) {
   }
 });
 
-server.listen(process.env.API_PORT);
+server.listen(process.env.API_PORT, () => {
+  console.log(`Server is running on port ${process.env.API_PORT}`);
+});
