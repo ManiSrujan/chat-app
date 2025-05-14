@@ -4,7 +4,9 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon src/server.js"
+    "start": "nodemon src/server.js",
+    "format": "prettier-eslint --write \"src/**/*.js\"",
+    "format:check": "prettier-eslint --list-different \"src/**/*.js\""
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.9",
-    "prettier-eslint": "^16.3.0"
+    "prettier-eslint": "^16.3.0",
+    "prettier-eslint-cli": "^8.0.1"
   }
 }
