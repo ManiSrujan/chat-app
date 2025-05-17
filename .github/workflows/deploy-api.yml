@@ -22,6 +22,9 @@ jobs:
                 key: ${{ secrets.EC2_KEY }}
                 port: 22
                 script: |
+                    # exit if any command fails
+                    set -e
+                    
                     # move to repo directory
                     cd '~/chat-app'
 
