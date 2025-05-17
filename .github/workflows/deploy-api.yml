@@ -20,4 +20,19 @@ jobs:
                 username: ${{ secrets.EC2_USER }}
                 key: ${{ secrets.EC2_KEY }}
                 port: 22
-                script_path: ~/chat-app/scripts/deploy-api.sh
+                script: |
+                    # move to repo directory
+                    cd '~/chat-app'
+
+                    # pull latest code from git
+                    git checkout master
+                    git pull origin master
+
+                    # move to api directory
+                    cd api
+
+                    # install dependencies
+                    npm ci
+
+                    # restart the service
+                    sudo systemctl restart chat-application
