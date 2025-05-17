@@ -3,10 +3,6 @@
 name: Build API
 
 on:
-    push:
-        branches: [ "master" ]
-        paths-ignore:
-            - 'app/**'
     pull_request:
         branches: [ "master" ]
         paths-ignore:
