@@ -24,9 +24,9 @@ jobs:
                 script: |
                     # exit if any command fails
                     set -e
-                    
+
                     # move to repo directory
-                    cd '~/chat-app'
+                    cd ~/chat-app
 
                     # pull latest code from git
                     git checkout master
