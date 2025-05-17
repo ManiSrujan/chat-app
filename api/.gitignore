@@ -2,3 +2,4 @@ node_modules
 request.rest
 user1.js
 user2.js
+.env
