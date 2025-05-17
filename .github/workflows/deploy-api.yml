@@ -26,6 +26,8 @@ jobs:
                     set -e
 
                     # move to repo directory
+                    pwd
+                    ls
                     cd ~/chat-app
 
                     # pull latest code from git
