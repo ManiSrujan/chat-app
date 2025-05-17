@@ -1,0 +1,23 @@
+# This workflow is triggered on push event to the master branch, but ignores changes in the 'app' directory.
+
+name: Deploy API
+
+on:
+    push:
+        branches: [ "master" ]
+        paths-ignore:
+            - 'app/**'
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        environment: production
+
+        steps:
+            - uses: appleboy/ssh-action@v1.2.2
+              with:
+                host: ${{ secrets.EC2_HOST }}
+                username: ${{ secrets.EC2_USER }}
+                key: ${{ secrets.EC2_KEY }}
+                port: 22
+                scriptPath: scripts/deploy-api.sh
