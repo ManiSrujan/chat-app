@@ -6,9 +6,17 @@
   "scripts": {
     "build": "rsbuild build",
     "dev": "rsbuild dev --open",
-    "preview": "rsbuild preview"
+    "preview": "rsbuild preview",
+    "format": "prettier-eslint --write \"src/**/*.js\"",
+    "format:check": "prettier-eslint --list-different \"src/**/*.js\""
   },
   "dependencies": {
+    "@emotion/css": "^11.13.5",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/roboto": "^5.2.5",
+    "@mui/icons-material": "^7.1.0",
+    "@mui/material": "^7.1.0",
     "axios": "^1.9.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -23,6 +31,7 @@
     "@types/react-dom": "^18.3.5",
     "@types/websocket": "^1.0.10",
     "prettier-eslint": "^16.4.1",
+    "prettier-eslint-cli": "^8.0.1",
     "typescript": "^5.8.2"
   }
 }
