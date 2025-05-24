@@ -5,9 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "rsbuild build",
-    "check": "biome check --write",
     "dev": "rsbuild dev --open",
-    "format": "biome format --write",
     "preview": "rsbuild preview"
   },
   "dependencies": {
