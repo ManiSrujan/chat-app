@@ -4,7 +4,16 @@ import { IFormErrors, useFormValidation } from "../../hooks/useFormValidation";
 import { ENV_CONFIG_KEY } from "../../common/env-config/constants";
 import { getEnvConfig } from "../../common/env-config/envConfig";
 import restClient from "../../common/rest-client/restClient";
+import { getItem, setItem } from "../../common/local-storage/localStorage";
+import { ILoginConfig, StorageKeys } from "../../common/types/storage.types";
+import { useMemo } from "react";
 
+interface ILoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  userId: string;
+  userName: string;
+}
 interface IUseSignInReturn {
   formData: ISignInFormData;
   formErrors: IFormErrors;
@@ -23,27 +32,41 @@ const useSignIn = (): IUseSignInReturn => {
   const { formData, formErrors, handleChange, handleBlur, validateForm } =
     useFormValidation<ISignInFormData>(initialData, signInValidationRules);
 
+  useMemo(() => {
+    const loginConfig = getItem<ILoginConfig>(StorageKeys.LOGIN_CONFIG);
+
+    if (loginConfig && loginConfig.accessToken) {
+      // If user is already logged in, redirect to chat
+      setLocation("/chat");
+    }
+  }, []);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (validateForm()) {
       try {
-        const response = await restClient.post(
+        const response = await restClient.post<ILoginResponse>(
           `${getEnvConfig(ENV_CONFIG_KEY.API)}/auth/login`,
-          formData,
+          {
+            username: formData.username,
+            password: formData.password,
+          },
         );
         const { accessToken, refreshToken, userId, userName } = response.data;
 
         // Store tokens and user info
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        localStorage.setItem("userId", userId);
-        localStorage.setItem("userName", userName);
+        setItem(StorageKeys.LOGIN_CONFIG, {
+          accessToken,
+          refreshToken,
+          userId,
+          userName,
+        });
 
         // Redirect to chat
         setLocation("/chat");
       } catch (error) {
+        // TODO: Add a notification component that displays error later
         console.error("Login failed:", error);
-        // TODO: Handle login errors properly
       }
     }
   };

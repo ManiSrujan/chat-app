@@ -1,13 +1,17 @@
 import axios from "axios";
 import { ENV_CONFIG_KEY } from "../env-config/constants";
 import { getEnvConfig } from "../env-config/envConfig";
+import { getItem, removeItem, setItem } from "../local-storage/localStorage";
+import { ILoginConfig, StorageKeys } from "../types/storage.types";
 
 const restClient = axios.create();
 
 // Add a request interceptor to include the accessToken in the Authorization header
 restClient.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = getItem<ILoginConfig>(
+      StorageKeys.LOGIN_CONFIG,
+    )?.accessToken;
     if (accessToken) {
       config.headers = config.headers || {};
       config.headers["Authorization"] = `Bearer ${accessToken}`;
@@ -31,12 +35,13 @@ restClient.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       try {
-        const refreshToken = localStorage.getItem("refreshToken");
-        if (!refreshToken) {
+        const loginConfig = getItem<ILoginConfig>(StorageKeys.LOGIN_CONFIG);
+        if (!loginConfig?.refreshToken) {
           throw new Error("Refresh token not available");
         }
+        const refreshToken = loginConfig.refreshToken;
 
-        const refreshResponse = await axios.post(
+        const refreshResponse = await axios.post<{ accessToken: string }>(
           `${getEnvConfig(ENV_CONFIG_KEY.API)}/auth/refresh`,
           {
             refreshToken,
@@ -44,15 +49,17 @@ restClient.interceptors.response.use(
         );
 
         const { accessToken } = refreshResponse.data;
-        localStorage.setItem("accessToken", accessToken);
+        setItem<ILoginConfig>(StorageKeys.LOGIN_CONFIG, {
+          ...loginConfig,
+          accessToken,
+        });
 
         // Update the Authorization header and retry the original request
         originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
         return restClient(originalRequest);
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
+        removeItem(StorageKeys.LOGIN_CONFIG); // Clear login config on refresh failure
         window.location.href = "/"; // Redirect to login page
         return Promise.reject(refreshError);
       }
