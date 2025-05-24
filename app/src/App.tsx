@@ -1,13 +1,29 @@
 import { Route, Switch } from "wouter";
 import Chat from "./apps/chat/Chat";
-import Login from "./apps/login/Login";
+import SingUp from "./apps/signup";
+import { css } from "@emotion/css";
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+import "./normalize.css";
 
-const App = () => {
+const App = (): JSX.Element => {
   return (
-    <Switch>
-      <Route path="/" component={Login} />
-      <Route path="/chat" component={Chat} />
-    </Switch>
+    <div
+      className={css`
+        height: 100vh;
+        width: 100vw;
+        div {
+          box-sizing: border-box;
+        }
+      `}
+    >
+      <Switch>
+        <Route path="/signup" component={SingUp} />
+        <Route path="/chat" component={Chat} />
+      </Switch>
+    </div>
   );
 };
 
