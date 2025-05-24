@@ -13,8 +13,6 @@ const App = (): JSX.Element => {
   return (
     <div
       className={css`
-        height: 100vh;
-        width: 100vw;
         div {
           box-sizing: border-box;
         }
