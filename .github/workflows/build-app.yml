@@ -1,0 +1,18 @@
+# This workflow is triggered on pull request events to the master branch, but ignores changes in the 'app' directory.
+
+name: Build App
+
+on:
+    pull_request:
+        branches: [ "master" ]
+        paths-ignore:
+            - 'api/**'
+    workflow_dispatch:
+
+
+jobs:
+    Build:
+        runs-on: ubuntu-latest
+
+        steps:
+        - run: echo "Build App script will be executed here"

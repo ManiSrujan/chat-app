@@ -1,5 +1,5 @@
 const ENV_CONFIG = {
-  API: "http://localhost:3000",
+  API: "http://localhost",
 };
 
 if (self) {
