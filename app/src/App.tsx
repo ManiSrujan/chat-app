@@ -1,5 +1,5 @@
 import { Route, Switch } from "wouter";
-import Chat from "./apps/chat/Chat";
+import Chat from "./apps/chat-v2/Chat";
 import SignUp from "./apps/signup";
 import SignIn from "./apps/signin";
 import { css } from "@emotion/css";
