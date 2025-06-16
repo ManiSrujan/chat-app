@@ -144,15 +144,19 @@ app.delete("/chat/:id", verifyToken, async function handleChatDelete(req, res) {
   }
 });
 
-app.get("/chat/user/:id", verifyToken, async function handleGetChats(req, res) {
-  try {
-    const { id } = req.params;
-    const chats = await getChats(id);
-    res.status(200).send({ chats });
-  } catch (error) {
-    res.status(500).send({ message: getErrorMessage(error) });
-  }
-});
+app.get(
+  "/user/:id/chats",
+  verifyToken,
+  async function handleGetChats(req, res) {
+    try {
+      const { id } = req.params;
+      const chats = await getChats(id);
+      res.status(200).send(chats);
+    } catch (error) {
+      res.status(500).send({ message: getErrorMessage(error) });
+    }
+  },
+);
 
 app.post("/message", verifyToken, async function handleCreateMessage(req, res) {
   try {
@@ -201,7 +205,7 @@ app.delete(
 );
 
 app.get(
-  "/message/chat/:id",
+  "/chat/:id/messages",
   verifyToken,
   async function handleGetAllMessages(req, res) {
     try {
@@ -212,7 +216,7 @@ app.get(
       }
 
       const messages = await getAllMessage(id, sortDir);
-      res.status(200).send({ messages });
+      res.status(200).send(messages);
     } catch (error) {
       res.status(500).send({ message: getErrorMessage(error) });
     }

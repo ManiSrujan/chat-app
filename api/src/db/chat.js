@@ -1,5 +1,6 @@
 import { ERROR_MESSAGES } from "../constants.js";
 import { createClient } from "../utils/db.js";
+import { GET_CHATS_QUERY } from "./queries.js";
 
 async function createChat(userId1, userId2) {
   const client = createClient();
@@ -68,10 +69,7 @@ async function getChats(userId) {
   try {
     await client.connect();
 
-    const result = await client.query(
-      "SELECT chat_id FROM user_chat WHERE user_id = $1",
-      [userId],
-    );
+    const result = await client.query(GET_CHATS_QUERY, [userId]);
 
     return result.rows;
   } finally {
