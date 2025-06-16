@@ -1,7 +1,9 @@
 import { Box, Typography, TextField, IconButton, Paper } from "@mui/material";
 import { css } from "@emotion/css";
 import SendIcon from "@mui/icons-material/Send";
-import { IChatUser, IMessage } from "../chat.types";
+import { IChat, IMessage } from "../chat.types";
+import { getFullName, getLoggedUserId } from "../../../common/utils/user";
+import { getFormattedDate } from "../../../common/utils/date";
 
 const styles = {
   container: css`
@@ -46,7 +48,7 @@ const styles = {
 };
 
 interface IChatAreaProps {
-  selectedUser?: IChatUser;
+  selectedChat?: IChat;
   message: string;
   messages: IMessage[];
   onMessageChange: (value: string) => void;
@@ -55,14 +57,14 @@ interface IChatAreaProps {
 }
 
 const ChatArea = ({
-  selectedUser,
+  selectedChat,
   message,
   messages,
   onMessageChange,
   onSend,
   onKeyPress,
 }: IChatAreaProps) => {
-  if (!selectedUser) {
+  if (!selectedChat) {
     return (
       <Box
         className={styles.container}
@@ -71,7 +73,7 @@ const ChatArea = ({
         justifyContent="center"
       >
         <Typography color="text.secondary">
-          Select a user to start chatting
+          Select a chat to start chatting
         </Typography>
       </Box>
     );
@@ -80,15 +82,20 @@ const ChatArea = ({
   return (
     <Box className={styles.container}>
       <Box className={styles.header}>
-        <Typography variant="h6">{selectedUser.userName}</Typography>
+        <Typography variant="h6">
+          {getFullName(
+            selectedChat.users[0].first_name,
+            selectedChat.users[0].last_name,
+          )}
+        </Typography>
       </Box>
 
       <Box className={styles.messagesContainer}>
         {messages.map((msg) => (
           <Paper
-            key={msg.id}
+            key={msg.message_id}
             className={`${styles.message} ${
-              msg.sender === "user1"
+              msg.user_id === getLoggedUserId()
                 ? styles.sentMessage
                 : styles.receivedMessage
             }`}
@@ -100,7 +107,7 @@ const ChatArea = ({
               display="block"
               sx={{ opacity: 0.7, mt: 0.5 }}
             >
-              {msg.timestamp}
+              {getFormattedDate(new Date(msg.created_at))}
             </Typography>
           </Paper>
         ))}

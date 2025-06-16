@@ -20,10 +20,10 @@ const chatStyles = {
 };
 
 const Chat = () => {
-  const { users, selectedUser, handleUserSelect, loading, error } =
+  const { chats, selectedChat, handleChatSelect, loading, error } =
     useChatList();
   const { message, messages, handleMessageChange, handleSend, handleKeyPress } =
-    useChatArea(selectedUser);
+    useChatArea(selectedChat);
 
   if (loading) {
     return (
@@ -44,12 +44,12 @@ const Chat = () => {
   return (
     <Paper square elevation={3} className={chatStyles.paper}>
       <ChatList
-        users={users}
-        selectedUser={selectedUser}
-        onUserSelect={handleUserSelect}
+        chats={chats}
+        selectedChat={selectedChat}
+        onChatSelect={handleChatSelect}
       />
       <ChatArea
-        selectedUser={selectedUser}
+        selectedChat={selectedChat}
         message={message}
         messages={messages}
         onMessageChange={handleMessageChange}

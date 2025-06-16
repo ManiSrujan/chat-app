@@ -1,27 +1,31 @@
 export interface IUser {
   user_id: string;
-  user_name: string;
   first_name: string;
   last_name: string;
 }
 
-export interface IChatUser {
-  userId: string;
-  userName: string;
-  lastMessage?: string;
-  lastMessageTime?: string;
-  isOnline?: boolean;
+export interface IChat {
+  chat_id: string;
+  users: IUser[];
+  last_message: {
+    message_id: string;
+    user_id: string;
+    user_name: string;
+    content: string;
+    created_at: string;
+  };
 }
 
 export interface IMessage {
-  id: string;
+  message_id: string;
+  user_id: string;
   content: string;
-  sender: string;
-  timestamp: string;
+  created_at: string;
+  user_name: string;
 }
 
 export interface IChatV2Props {
-  users: IChatUser[];
-  selectedUser?: IChatUser;
-  onUserSelect: (user: IChatUser) => void;
+  chats: IChat[];
+  selectedChat?: IChat;
+  onChatSelect: (chat: IChat) => void;
 }

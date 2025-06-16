@@ -10,15 +10,17 @@ import {
   Divider,
 } from "@mui/material";
 import { css } from "@emotion/css";
-import { IChatUser } from "../chat.types";
+import { IChat } from "../chat.types";
+import { getFullName, getLoggedUserId } from "../../../common/utils/user";
+import { getRelativeTime } from "../../../common/utils/date";
 
 const styles = {
-  usersList: css`
+  chatsList: css`
     width: 300px;
     border-right: 1px solid rgba(0, 0, 0, 0.12);
     overflow: auto;
   `,
-  userItem: css`
+  chatItem: css`
     &:hover {
       background-color: rgba(0, 0, 0, 0.04);
     }
@@ -26,23 +28,23 @@ const styles = {
 };
 
 interface IChatListProps {
-  users: IChatUser[];
-  selectedUser?: IChatUser;
-  onUserSelect: (user: IChatUser) => void;
+  chats: IChat[];
+  selectedChat?: IChat;
+  onChatSelect: (chat: IChat) => void;
 }
 
-const ChatList = ({ users, selectedUser, onUserSelect }: IChatListProps) => {
+const ChatList = ({ chats, selectedChat, onChatSelect }: IChatListProps) => {
   return (
-    <List className={styles.usersList}>
-      {users.map((user: IChatUser) => (
-        <Box key={user.userId}>
-          <ListItem disablePadding className={styles.userItem}>
+    <List className={styles.chatsList}>
+      {chats.map((chat: IChat) => (
+        <Box key={chat.chat_id}>
+          <ListItem disablePadding className={styles.chatItem}>
             <ListItemButton
-              selected={selectedUser?.userId === user.userId}
-              onClick={() => onUserSelect(user)}
+              selected={selectedChat?.chat_id === chat.chat_id}
+              onClick={() => onChatSelect(chat)}
             >
               <ListItemAvatar>
-                <Avatar>{user.userName.charAt(0)}</Avatar>
+                <Avatar>{chat.users[0].first_name.charAt(0)}</Avatar>
               </ListItemAvatar>
               <ListItemText
                 primary={
@@ -52,10 +54,16 @@ const ChatList = ({ users, selectedUser, onUserSelect }: IChatListProps) => {
                     alignItems="center"
                   >
                     <Typography variant="subtitle1" component="span">
-                      {user.userName}
+                      {getFullName(
+                        chat.users[0].first_name,
+                        chat.users[0].last_name,
+                      )}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {user.lastMessageTime}
+                      {getRelativeTime(
+                        new Date(chat.last_message.created_at),
+                        new Date(),
+                      )}
                     </Typography>
                   </Box>
                 }
@@ -69,7 +77,10 @@ const ChatList = ({ users, selectedUser, onUserSelect }: IChatListProps) => {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {user.lastMessage}
+                    {chat.last_message.user_id === getLoggedUserId()
+                      ? "You: "
+                      : ""}
+                    {chat.last_message.content}
                   </Typography>
                 }
               />

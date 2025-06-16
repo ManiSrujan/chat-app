@@ -1,56 +1,49 @@
 import { useState, useEffect } from "react";
-import { IChatUser } from "../chat.types";
+import { IChat } from "../chat.types";
+import restClient from "../../../common/rest-client/restClient";
+import { getEnvConfig } from "../../../common/env-config/envConfig";
+import { ENV_CONFIG_KEY } from "../../../common/env-config/constants";
+import { getLoggedUserId } from "../../../common/utils/user";
 
 interface IUseChatListReturn {
-  users: IChatUser[];
-  selectedUser: IChatUser | undefined;
-  handleUserSelect: (user: IChatUser) => void;
+  chats: IChat[];
+  selectedChat: IChat | undefined;
+  handleChatSelect: (chat: IChat) => void;
   loading: boolean;
   error: string | null;
 }
 
 const useChatList = (): IUseChatListReturn => {
-  const [users, setUsers] = useState<IChatUser[]>([]);
-  const [selectedUser, setSelectedUser] = useState<IChatUser>();
+  const [chats, setChats] = useState<IChat[]>([]);
+  const [selectedChat, setSelectedChat] = useState<IChat>();
   const [loading, setLoading] = useState(true);
   const [error] = useState<string | null>(null);
 
   useEffect(() => {
-    // For now using dummy data - will be replaced with API integration
-    setUsers([
-      {
-        userId: "1",
-        userName: "John Doe",
-        lastMessage: "Hey, how are you?",
-        lastMessageTime: "10:30 AM",
-        isOnline: true,
-      },
-      {
-        userId: "2",
-        userName: "Jane Smith",
-        lastMessage: "Can we meet tomorrow?",
-        lastMessageTime: "Yesterday",
-        isOnline: false,
-      },
-      {
-        userId: "3",
-        userName: "Mike Johnson",
-        lastMessage: "The project is ready",
-        lastMessageTime: "2 days ago",
-        isOnline: true,
-      },
-    ]);
-    setLoading(false);
+    async function getChats() {
+      try {
+        const response = await restClient.get<IChat[]>(
+          `${getEnvConfig(ENV_CONFIG_KEY.API)}/user/${getLoggedUserId()}/chats`,
+        );
+        setChats(response.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    getChats();
   }, []);
 
-  const handleUserSelect = (user: IChatUser) => {
-    setSelectedUser(user);
+  const handleChatSelect = (chat: IChat) => {
+    setSelectedChat(chat);
   };
 
   return {
-    users,
-    selectedUser,
-    handleUserSelect,
+    chats,
+    selectedChat,
+    handleChatSelect,
     loading,
     error,
   };
