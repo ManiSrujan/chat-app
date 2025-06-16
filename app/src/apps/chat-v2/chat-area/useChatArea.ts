@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { IChatUser, IMessage } from "../chat.types";
+import { IChat, IMessage } from "../chat.types";
+import restClient from "../../../common/rest-client/restClient";
+import { getEnvConfig } from "../../../common/env-config/envConfig";
+import { ENV_CONFIG_KEY } from "../../../common/env-config/constants";
 
 interface IUseChatAreaReturn {
   message: string;
@@ -9,50 +12,35 @@ interface IUseChatAreaReturn {
   handleKeyPress: (event: React.KeyboardEvent) => void;
 }
 
-export const useChatArea = (selectedUser?: IChatUser): IUseChatAreaReturn => {
+export const useChatArea = (selectedChat?: IChat): IUseChatAreaReturn => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<IMessage[]>([]);
 
   useEffect(() => {
-    if (selectedUser) {
-      // This will be replaced with actual API call later
-      setMessages([
-        {
-          id: "1",
-          content: "Hey, how are you?",
-          sender: "user1",
-          timestamp: "10:30 AM",
-        },
-        {
-          id: "2",
-          content: "I'm good, thanks! How about you?",
-          sender: "user2",
-          timestamp: "10:31 AM",
-        },
-        {
-          id: "3",
-          content: "Great! Working on some new features.",
-          sender: "user1",
-          timestamp: "10:32 AM",
-        },
-        {
-          id: "4",
-          content: "That sounds interesting! Can you tell me more about it?",
-          sender: "user2",
-          timestamp: "10:33 AM",
-        },
-      ]);
-    } else {
-      setMessages([]);
+    async function fetchMessages() {
+      try {
+        if (selectedChat) {
+          const response = await restClient.get<IMessage[]>(
+            `${getEnvConfig(ENV_CONFIG_KEY.API)}/chat/${selectedChat.chat_id}/messages`,
+          );
+          setMessages(response.data);
+        } else {
+          setMessages([]);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
-  }, [selectedUser]);
+
+    fetchMessages();
+  }, [selectedChat]);
 
   const handleMessageChange = (value: string) => {
     setMessage(value);
   };
 
   const handleSend = () => {
-    if (message.trim() && selectedUser) {
+    if (message.trim() && selectedChat) {
       // Here we'll add the logic to send the message
       // For now, just clear the input
       setMessage("");
