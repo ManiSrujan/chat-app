@@ -11,6 +11,7 @@ interface IUseChatListReturn {
   handleChatSelect: (chat: IChat) => void;
   loading: boolean;
   error: string | null;
+  setChats: React.Dispatch<React.SetStateAction<IChat[]>>;
 }
 
 const useChatList = (): IUseChatListReturn => {
@@ -46,6 +47,7 @@ const useChatList = (): IUseChatListReturn => {
     handleChatSelect,
     loading,
     error,
+    setChats,
   };
 };
 
