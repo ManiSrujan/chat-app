@@ -20,5 +20,9 @@ export function getLoggedUserName(): string | null {
 }
 
 export function getFullName(firstName: string, lastName: string) {
-  return `${firstName} ${lastName}`;
+  return `${firstName.charAt(0).toUpperCase() + firstName.slice(1)} ${lastName.charAt(0).toUpperCase() + lastName.slice(1)}`;
+}
+
+export function getAvatarName(firstName: string, lastName: string) {
+  return `${firstName.charAt(0).toUpperCase()}${lastName.charAt(0).toUpperCase()}`;
 }
