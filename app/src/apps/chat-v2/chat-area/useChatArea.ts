@@ -3,18 +3,24 @@ import { IChat, IMessage } from "../chat.types";
 import restClient from "../../../common/rest-client/restClient";
 import { getEnvConfig } from "../../../common/env-config/envConfig";
 import { ENV_CONFIG_KEY } from "../../../common/env-config/constants";
+import websocket from "websocket";
+import { getLoggedUserId, getLoggedUserName } from "../../../common/utils/user";
 
 interface IUseChatAreaReturn {
-  message: string;
-  messages: IMessage[];
-  handleMessageChange: (value: string) => void;
-  handleSend: () => void;
-  handleKeyPress: (event: React.KeyboardEvent) => void;
+  input: string;
+  handleInputChange: (value: string) => void;
+  handleSend: (client: websocket.w3cwebsocket | null) => void;
+  handleKeyPress: (
+    event: React.KeyboardEvent,
+    client: websocket.w3cwebsocket | null,
+  ) => void;
 }
 
-export const useChatArea = (selectedChat?: IChat): IUseChatAreaReturn => {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<IMessage[]>([]);
+export const useChatArea = (
+  setMessages: React.Dispatch<React.SetStateAction<IMessage[]>>,
+  selectedChat?: IChat,
+): IUseChatAreaReturn => {
+  const [input, setInput] = useState("");
 
   useEffect(() => {
     async function fetchMessages() {
@@ -35,29 +41,58 @@ export const useChatArea = (selectedChat?: IChat): IUseChatAreaReturn => {
     fetchMessages();
   }, [selectedChat]);
 
-  const handleMessageChange = (value: string) => {
-    setMessage(value);
+  const handleInputChange = (value: string) => {
+    setInput(value);
   };
 
-  const handleSend = () => {
-    if (message.trim() && selectedChat) {
-      // Here we'll add the logic to send the message
-      // For now, just clear the input
-      setMessage("");
+  const handleSend = (client: websocket.w3cwebsocket | null) => {
+    if (!client) {
+      return;
     }
+    const trimmedInput = input.trim();
+    const userId = getLoggedUserId();
+    const userName = getLoggedUserName();
+
+    if (trimmedInput && selectedChat && userId && userName) {
+      client.send(
+        JSON.stringify({
+          type: "message",
+          data: {
+            srcUserId: getLoggedUserId(),
+            chatId: selectedChat.chat_id,
+            message: trimmedInput,
+          },
+        }),
+      );
+
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          content: trimmedInput,
+          created_at: new Date().toISOString(),
+          message_id: "dummy-message-id",
+          user_id: userId,
+          user_name: userName,
+        },
+      ]);
+    }
+
+    setInput("");
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent) => {
+  const handleKeyPress = (
+    event: React.KeyboardEvent,
+    client: websocket.w3cwebsocket | null,
+  ) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      handleSend();
+      handleSend(client);
     }
   };
 
   return {
-    message,
-    messages,
-    handleMessageChange,
+    input,
+    handleInputChange,
     handleSend,
     handleKeyPress,
   };
