@@ -4,6 +4,8 @@ import useChatArea from "./chat-area/useChatArea";
 import useChatList from "./chat-list/useChatList";
 import ChatList from "./chat-list/ChatList";
 import ChatArea from "./chat-area/ChatArea";
+import useSocketCommunication from "./useSocketCommunication";
+import { useState } from "react";
 
 const chatStyles = {
   paper: css`
@@ -20,10 +22,14 @@ const chatStyles = {
 };
 
 const Chat = () => {
+  const [messages, setMessages] = useState<IMessage[]>([]);
   const { chats, selectedChat, handleChatSelect, loading, error } =
     useChatList();
-  const { message, messages, handleMessageChange, handleSend, handleKeyPress } =
-    useChatArea(selectedChat);
+  const { input, handleInputChange, handleSend, handleKeyPress } = useChatArea(
+    setMessages,
+    selectedChat,
+  );
+  const { client } = useSocketCommunication(setMessages);
 
   if (loading) {
     return (
@@ -50,11 +56,11 @@ const Chat = () => {
       />
       <ChatArea
         selectedChat={selectedChat}
-        message={message}
+        input={input}
         messages={messages}
-        onMessageChange={handleMessageChange}
-        onSend={handleSend}
-        onKeyPress={handleKeyPress}
+        onInputChange={handleInputChange}
+        onSend={() => handleSend(client)}
+        onKeyPress={(event) => handleKeyPress(event, client)}
       />
     </Paper>
   );

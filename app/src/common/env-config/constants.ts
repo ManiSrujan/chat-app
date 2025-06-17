@@ -1,4 +1,4 @@
 export const ENV_CONFIG_KEY = {
-  AUTH: "AUTH",
+  WEBSOCKET: "WEBSOCKET",
   API: "API",
 } as const;

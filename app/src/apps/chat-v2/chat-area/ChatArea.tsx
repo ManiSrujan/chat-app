@@ -49,18 +49,18 @@ const styles = {
 
 interface IChatAreaProps {
   selectedChat?: IChat;
-  message: string;
+  input: string;
   messages: IMessage[];
-  onMessageChange: (value: string) => void;
+  onInputChange: (value: string) => void;
   onSend: () => void;
   onKeyPress: (event: React.KeyboardEvent) => void;
 }
 
 const ChatArea = ({
   selectedChat,
-  message,
+  input,
   messages,
-  onMessageChange,
+  onInputChange,
   onSend,
   onKeyPress,
 }: IChatAreaProps) => {
@@ -119,13 +119,13 @@ const ChatArea = ({
           multiline
           maxRows={4}
           placeholder="Type a message..."
-          value={message}
-          onChange={(e) => onMessageChange(e.target.value)}
+          value={input}
+          onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={onKeyPress}
           variant="outlined"
           size="small"
         />
-        <IconButton color="primary" onClick={onSend} disabled={!message.trim()}>
+        <IconButton color="primary" onClick={onSend} disabled={!input.trim()}>
           <SendIcon />
         </IconButton>
       </Box>
