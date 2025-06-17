@@ -11,13 +11,18 @@ import {
 } from "@mui/material";
 import { css } from "@emotion/css";
 import { IChat } from "../chat.types";
-import { getFullName, getLoggedUserId } from "../../../common/utils/user";
+import {
+  getAvatarName,
+  getFullName,
+  getLoggedUserId,
+} from "../../../common/utils/user";
 import { getRelativeTime } from "../../../common/utils/date";
 
 const styles = {
   chatsList: css`
-    width: 300px;
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    background-color: #121214;
+    min-width: 300px;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
     overflow: auto;
   `,
   chatItem: css`
@@ -44,7 +49,12 @@ const ChatList = ({ chats, selectedChat, onChatSelect }: IChatListProps) => {
               onClick={() => onChatSelect(chat)}
             >
               <ListItemAvatar>
-                <Avatar>{chat.users[0].first_name.charAt(0)}</Avatar>
+                <Avatar sx={{ bgcolor: "#036825", color: "#fff" }}>
+                  {getAvatarName(
+                    chat.users[0].first_name,
+                    chat.users[0].last_name,
+                  )}
+                </Avatar>
               </ListItemAvatar>
               <ListItemText
                 primary={

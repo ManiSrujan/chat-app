@@ -1,20 +1,35 @@
-import { Box, Typography, TextField, IconButton, Paper } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  IconButton,
+  Paper,
+  ListItemAvatar,
+  Avatar,
+} from "@mui/material";
 import { css } from "@emotion/css";
 import SendIcon from "@mui/icons-material/Send";
 import { IChat, IMessage } from "../chat.types";
-import { getFullName, getLoggedUserId } from "../../../common/utils/user";
+import {
+  getAvatarName,
+  getFullName,
+  getLoggedUserId,
+} from "../../../common/utils/user";
 import { getFormattedDate } from "../../../common/utils/date";
 
 const styles = {
   container: css`
+    background: #1a1a1e;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     height: 100%;
   `,
   header: css`
-    padding: 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   `,
   messagesContainer: css`
     flex-grow: 1;
@@ -24,19 +39,22 @@ const styles = {
     flex-direction: column;
   `,
   message: css`
-    margin-bottom: 8px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
     max-width: 70%;
-    padding: 8px 16px;
-    border-radius: 12px;
+    margin-bottom: 8px;
+    padding: 8px;
   `,
   sentMessage: css`
+    background-color: #036825 !important;
     align-self: flex-end;
-    background-color: #1976d2;
     color: white;
   `,
   receivedMessage: css`
     align-self: flex-start;
-    background-color: #f5f5f5;
+    background-color: #272727 !important;
   `,
   inputContainer: css`
     padding: 16px;
@@ -82,6 +100,14 @@ const ChatArea = ({
   return (
     <Box className={styles.container}>
       <Box className={styles.header}>
+        <ListItemAvatar>
+          <Avatar sx={{ bgcolor: "#036825", color: "#fff" }}>
+            {getAvatarName(
+              selectedChat.users[0].first_name,
+              selectedChat.users[0].last_name,
+            )}
+          </Avatar>
+        </ListItemAvatar>
         <Typography variant="h6">
           {getFullName(
             selectedChat.users[0].first_name,
@@ -101,11 +127,15 @@ const ChatArea = ({
             }`}
             elevation={0}
           >
-            <Typography variant="body1">{msg.content}</Typography>
+            <Typography variant="body2">{msg.content}</Typography>
             <Typography
               variant="caption"
-              display="block"
-              sx={{ opacity: 0.7, mt: 0.5 }}
+              sx={{
+                opacity: 0.7,
+                lineHeight: 0,
+                position: "relative",
+                top: "5px",
+              }}
             >
               {getFormattedDate(new Date(msg.created_at))}
             </Typography>
