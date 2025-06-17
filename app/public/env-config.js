@@ -1,5 +1,6 @@
 const ENV_CONFIG = {
   API: "http://localhost",
+  WEBSOCKET: "ws://localhost",
 };
 
 if (self) {
