@@ -37,64 +37,70 @@ const wsServer = new WebSocketServer({
 });
 const webSocketConnections = {};
 
-wsServer.on("request", function handleWSRequest(request) {
-  if (request.origin !== process.env.WEBSOCKET_ALLOWED_ORIGIN) {
-    console.log("Origin not allowed:", request.origin);
-    request.reject(403, "Origin not allowed");
-    return;
-  }
+wsServer.on("request", async function handleWSRequest(request) {
+  try {
+    if (request.origin !== process.env.WEBSOCKET_ALLOWED_ORIGIN) {
+      request.reject(403, "Origin not allowed");
+      return;
+    }
+    const token = request.resourceURL.query.token;
+    const userData = await verifyJWTToken(
+      token,
+      process.env.ACCESS_TOKEN_SECRET,
+    );
+    const connection = request.accept("chat", request.origin);
+    webSocketConnections[userData.userId] = connection;
 
-  const connection = request.accept("chat", request.origin);
+    connection.on("close", function handleClose(reasonCode, description) {
+      console.log("Client has disconnected:", reasonCode, description);
+      Object.keys(webSocketConnections).forEach((userId) => {
+        if (!webSocketConnections[userId].connected) {
+          delete webSocketConnections[userId];
+        }
+      });
+    });
 
-  connection.on("close", function handleClose(reasonCode, description) {
-    console.log("Client has disconnected:", reasonCode, description);
-    Object.keys(webSocketConnections).forEach((userId) => {
-      if (!webSocketConnections[userId].connected) {
-        delete webSocketConnections[userId];
+    connection.on("message", async function handleMessage(message) {
+      if (message.type === "utf8") {
+        const parsedMessage = JSON.parse(message.utf8Data);
+        const { type, data } = parsedMessage;
+
+        switch (type) {
+          case "disconnect":
+            delete webSocketConnections[data["userId"]];
+            break;
+          case "message":
+            const { srcUserId, chatId, message } = data;
+            const usersOfChat = await getUsersOfChat(chatId);
+            const targetUserId = usersOfChat.find(
+              (user) => user.user_id !== srcUserId,
+            ).user_id;
+            const response = await createMessage(chatId, srcUserId, message);
+            const srcUserName = (await getUserById(srcUserId))[0].user_name;
+            const targetUserConnection = webSocketConnections[targetUserId];
+
+            if (targetUserConnection && targetUserConnection.connected) {
+              targetUserConnection.sendUTF(
+                JSON.stringify({
+                  type: "message",
+                  data: {
+                    content: message,
+                    created_at: response.created_at,
+                    message_id: response.message_id,
+                    user_id: response.user_id,
+                    user_name: srcUserName,
+                  },
+                }),
+              );
+            }
+            break;
+        }
       }
     });
-  });
-
-  connection.on("message", async function handleMessage(message) {
-    if (message.type === "utf8") {
-      const parsedMessage = JSON.parse(message.utf8Data);
-      const { type, data } = parsedMessage;
-
-      switch (type) {
-        case "connect":
-          webSocketConnections[data["userId"]] = connection;
-          break;
-        case "disconnect":
-          delete webSocketConnections[data["userId"]];
-          break;
-        case "message":
-          const { srcUserId, chatId, message } = data;
-          const usersOfChat = await getUsersOfChat(chatId);
-          const targetUserId = usersOfChat.find(
-            (user) => user.user_id !== srcUserId,
-          ).user_id;
-          const response = await createMessage(chatId, srcUserId, message);
-          const srcUserName = (await getUserById(srcUserId))[0].user_name;
-          const targetUserConnection = webSocketConnections[targetUserId];
-
-          if (targetUserConnection && targetUserConnection.connected) {
-            targetUserConnection.sendUTF(
-              JSON.stringify({
-                type: "message",
-                data: {
-                  content: message,
-                  created_at: response.created_at,
-                  message_id: response.message_id,
-                  user_id: response.user_id,
-                  user_name: srcUserName,
-                },
-              }),
-            );
-          }
-          break;
-      }
-    }
-  });
+  } catch (error) {
+    request.reject(403, "Token verification failed");
+    return;
+  }
 });
 
 async function verifyToken(req, res, next) {
@@ -228,16 +234,18 @@ app.post("/auth/login", async function loginUser(req, res) {
     const { username, password } = req.body;
 
     // verify username and password
-    await verifyPassword(username, password);
+    const user = await verifyPassword(username, password);
 
     const [accessToken, refreshToken] = await Promise.all([
       generateJWTToken(
+        user.user_id,
         username,
         password,
         process.env.ACCESS_TOKEN_SECRET,
         process.env.ACCESS_TOKEN_EXPIRE,
       ),
       generateJWTToken(
+        user.user_id,
         username,
         password,
         process.env.REFRESH_TOKEN_SECRET,
@@ -283,8 +291,9 @@ app.post("/auth/refresh", async function refreshUserToken(req, res) {
       process.env.REFRESH_TOKEN_SECRET,
     );
 
-    const { username, password } = data;
+    const { userId, username, password } = data;
     const newAccessToken = await generateJWTToken(
+      userId,
       username,
       password,
       process.env.ACCESS_TOKEN_SECRET,

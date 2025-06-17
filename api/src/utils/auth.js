@@ -38,17 +38,20 @@ async function verifyPassword(username, password) {
     if (!isCorrectPass) {
       throw new Error(ERROR_MESSAGES.WrongPassword);
     }
+    return user[0];
   } catch (error) {
     throw error;
   }
 }
 
-async function generateJWTToken(username, password, secret, expiresIn) {
+async function generateJWTToken(userId, username, password, secret, expiresIn) {
   if (expiresIn) {
-    const token = jwt.sign({ username, password }, secret, { expiresIn });
+    const token = jwt.sign({ userId, username, password }, secret, {
+      expiresIn,
+    });
     return token;
   }
-  const token = jwt.sign({ username, password }, secret);
+  const token = jwt.sign({ userId, username, password }, secret);
   return token;
 }
 
