@@ -6,6 +6,7 @@ import ChatList from "./chat-list/ChatList";
 import ChatArea from "./chat-area/ChatArea";
 import useSocketCommunication from "./useSocketCommunication";
 import { useState } from "react";
+import { IMessage } from "./chat.types";
 
 const chatStyles = {
   paper: css`
@@ -23,10 +24,11 @@ const chatStyles = {
 
 const Chat = () => {
   const [messages, setMessages] = useState<IMessage[]>([]);
-  const { chats, selectedChat, handleChatSelect, loading, error } =
+  const { chats, selectedChat, handleChatSelect, loading, error, setChats } =
     useChatList();
   const { input, handleInputChange, handleSend, handleKeyPress } = useChatArea(
     setMessages,
+    setChats,
     selectedChat,
   );
   const { client } = useSocketCommunication(setMessages);

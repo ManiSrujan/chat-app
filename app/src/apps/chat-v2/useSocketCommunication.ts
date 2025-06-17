@@ -4,6 +4,7 @@ import { getEnvConfig } from "../../common/env-config/envConfig";
 import { ENV_CONFIG_KEY } from "../../common/env-config/constants";
 import { getItem } from "../../common/local-storage/localStorage";
 import { ILoginConfig, StorageKeys } from "../../common/types/storage.types";
+import { IMessage } from "./chat.types";
 
 const useSocketCommunication = (
   setMessages: React.Dispatch<React.SetStateAction<IMessage[]>>,

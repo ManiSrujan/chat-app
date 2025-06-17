@@ -18,6 +18,7 @@ interface IUseChatAreaReturn {
 
 export const useChatArea = (
   setMessages: React.Dispatch<React.SetStateAction<IMessage[]>>,
+  setChats: React.Dispatch<React.SetStateAction<IChat[]>>,
   selectedChat?: IChat,
 ): IUseChatAreaReturn => {
   const [input, setInput] = useState("");
@@ -65,16 +66,24 @@ export const useChatArea = (
         }),
       );
 
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          content: trimmedInput,
-          created_at: new Date().toISOString(),
-          message_id: "dummy-message-id",
-          user_id: userId,
-          user_name: userName,
-        },
-      ]);
+      const newMessage = {
+        content: trimmedInput,
+        created_at: new Date().toISOString(),
+        message_id: "dummy-message-id",
+        user_id: userId,
+        user_name: userName,
+      };
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.chat_id === selectedChat.chat_id
+            ? {
+                ...chat,
+                last_message: newMessage,
+              }
+            : chat,
+        ),
+      );
     }
 
     setInput("");
