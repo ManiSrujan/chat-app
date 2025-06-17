@@ -8,7 +8,8 @@
     "dev": "rsbuild dev --open",
     "preview": "rsbuild preview",
     "format": "prettier-eslint --write \"src/**/*.js\"",
-    "format:check": "prettier-eslint --list-different \"src/**/*.js\""
+    "format:check": "prettier-eslint --list-different \"src/**/*.js\"",
+    "ts:check": "tsc"
   },
   "dependencies": {
     "@emotion/css": "^11.13.5",
