@@ -19,7 +19,7 @@ interface IUseChatAreaReturn {
 export const useChatArea = (
   setMessages: React.Dispatch<React.SetStateAction<IMessage[]>>,
   setChats: React.Dispatch<React.SetStateAction<IChat[]>>,
-  selectedChat?: IChat,
+  selectedChat: IChat | null | undefined,
 ): IUseChatAreaReturn => {
   const [input, setInput] = useState("");
 
