@@ -1,8 +1,33 @@
-export function getFormattedDate(date: Date) {
+export function getTimeString(date: Date) {
   const formatter = new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "numeric",
     hour12: true,
+  });
+
+  return formatter.format(date);
+}
+
+export function getFormattedDate(date: Date) {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  // Reset hours to compare just the dates
+  const compareDate = new Date(date);
+  [today, yesterday, compareDate].forEach((d) => {
+    d.setHours(0, 0, 0, 0);
+  });
+
+  if (compareDate.getTime() === today.getTime()) {
+    return "Today";
+  } else if (compareDate.getTime() === yesterday.getTime()) {
+    return "Yesterday";
+  }
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 
   return formatter.format(date);

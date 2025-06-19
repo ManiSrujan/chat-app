@@ -1,61 +1,110 @@
 import {
   Box,
-  Typography,
   TextField,
   IconButton,
-  Paper,
-  ListItemAvatar,
   Avatar,
+  Typography,
   styled,
-  Tooltip,
-  Menu,
-  MenuItem,
 } from "@mui/material";
 import { css } from "@emotion/css";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
 import SentimentSatisfiedRoundedIcon from "@mui/icons-material/SentimentSatisfiedRounded";
 import { IChat, IMessage } from "../chat.types";
-import {
-  getAvatarName,
-  getFullName,
-  getLoggedUserId,
-} from "../../../common/utils/user";
-import { getFormattedDate } from "../../../common/utils/date";
-import { useState, useRef, useEffect } from "react";
+import { getLoggedUserId, getFullName } from "../../../common/utils/user";
+import { getFormattedDate, getTimeString } from "../../../common/utils/date";
+import { useEffect, useRef } from "react";
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
+interface ChatAreaProps {
+  selectedChat?: IChat;
+  messages: IMessage[];
+  input: string;
+  onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSend: () => void;
+  onKeyPress: (event: React.KeyboardEvent) => void;
+}
+
+const MessageTextField = styled(TextField)({
   "& .MuiInputBase-root": {
-    backgroundColor: theme.palette.background.default,
-    borderRadius: "12px",
-    padding: "8px 14px",
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderRadius: "16px",
+    padding: "10px 16px",
+    fontSize: "0.9rem",
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+    backdropFilter: "blur(8px)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
     "&.Mui-focused": {
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: "rgba(255, 255, 255, 0.05)",
+      transform: "translateY(-2px)",
+      boxShadow: "0 4px 20px rgba(54, 179, 126, 0.15)",
+      border: "1px solid rgba(54, 179, 126, 0.3)",
+    },
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.04)",
+      border: "1px solid rgba(255, 255, 255, 0.15)",
     },
   },
   "& .MuiOutlinedInput-notchedOutline": {
-    borderColor: "rgba(255, 255, 255, 0.12)",
+    border: "none",
   },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderColor: "rgba(255, 255, 255, 0.2)",
+  "& .MuiInputBase-input": {
+    color: "#fff",
+    "&::placeholder": {
+      color: "rgba(255, 255, 255, 0.5)",
+      opacity: 1,
+    },
   },
-  "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: theme.palette.primary.main,
-  },
-}));
+});
 
-const StyledSendButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  width: 40,
-  height: 40,
+const ActionButton = styled(IconButton)({
+  color: "rgba(255, 255, 255, 0.7)",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  padding: "8px",
+  borderRadius: "12px",
+  backdropFilter: "blur(8px)",
+  border: "1px solid rgba(255, 255, 255, 0.08)",
+  backgroundColor: "rgba(255, 255, 255, 0.03)",
   "&:hover": {
-    backgroundColor: theme.palette.primary.dark,
+    color: "#36B37E",
+    transform: "translateY(-2px)",
+    backgroundColor: "rgba(54, 179, 126, 0.1)",
+    border: "1px solid rgba(54, 179, 126, 0.2)",
+    boxShadow: "0 4px 12px rgba(54, 179, 126, 0.15)",
+  },
+  "&:active": {
+    transform: "translateY(0)",
+  },
+  "& .MuiSvgIcon-root": {
+    transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  },
+  "&:hover .MuiSvgIcon-root": {
+    transform: "scale(1.1)",
+  },
+});
+
+const SendButton = styled(IconButton)({
+  backgroundColor: "#36B37E",
+  width: 42,
+  height: 42,
+  borderRadius: "14px",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  "&:hover": {
+    backgroundColor: "#2C9066",
+    transform: "translateY(-2px) scale(1.05)",
+    boxShadow: "0 4px 20px rgba(54, 179, 126, 0.3)",
+  },
+  "&:active": {
+    transform: "translateY(0) scale(0.95)",
   },
   "& .MuiSvgIcon-root": {
     fontSize: 20,
+    color: "#fff",
+    transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   },
-}));
+  "&:hover .MuiSvgIcon-root": {
+    transform: "rotate(10deg)",
+  },
+});
 
 const styles = {
   container: css`
@@ -64,6 +113,19 @@ const styles = {
     display: flex;
     flex-direction: column;
     height: 100%;
+    position: relative;
+    min-width: 0;
+    flex-basis: 70%;
+    overflow: hidden;
+
+    @media (max-width: 600px) {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+    }
   `,
   header: css`
     display: flex;
@@ -72,102 +134,247 @@ const styles = {
     padding: 8px 16px;
     background-color: rgba(255, 255, 255, 0.02);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    height: 56px;
   `,
   headerLeft: css`
     display: flex;
     align-items: center;
+    gap: 12px;
   `,
   headerRight: css`
     display: flex;
     align-items: center;
     gap: 8px;
   `,
-  messagesContainer: css`
+  logoutButton: css`
+    color: rgba(255, 255, 255, 0.7);
+    background: none;
+    border: none;
+    padding: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+
+    &:after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease-in-out;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+      transition: all 0.2s ease-in-out;
+    }
+
+    &:hover {
+      color: #36b37e;
+      background: rgba(54, 179, 126, 0.1);
+      transform: translateY(-1px);
+
+      &:after {
+        border-color: rgba(54, 179, 126, 0.2);
+      }
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  `,
+  userName: css`
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.8rem;
+  `,
+  status: css`
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem !important;
+  `,
+  messagesArea: css`
     flex-grow: 1;
     overflow-y: auto;
     padding: 16px;
     display: flex;
     flex-direction: column;
-    scroll-behavior: smooth;
+    gap: 8px;
 
-    /* Hide scrollbar for IE, Edge and Firefox */
-    -ms-overflow-style: none;
-    scrollbar-width: thin;
+    @media (max-width: 600px) {
+      padding: 12px;
+      height: calc(100vh - 130px);
+    }
 
-    /* Custom scrollbar styles */
     &::-webkit-scrollbar {
       width: 6px;
     }
-
     &::-webkit-scrollbar-track {
       background: transparent;
     }
-
     &::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.2);
       border-radius: 3px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  `,
+  messageWrapper: css`
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: bottom;
 
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.3);
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+        filter: blur(2px);
       }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    &:hover [class*="messageTime"] {
+      opacity: 1;
     }
   `,
   message: css`
-    display: flex;
-    gap: 6px;
-    align-items: flex-start;
-    max-width: 60%;
-    margin-bottom: 2px;
+    max-width: 65%;
     padding: 8px 12px;
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: #fff;
+    font-size: 0.85rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    line-height: 1.4;
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 6px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     position: relative;
+    overflow: hidden;
+    transform-origin: center left;
+    will-change: transform;
+
+    &:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        45deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.05) 100%
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+      &:before {
+        opacity: 1;
+      }
+
+      [class*="messageTime"] {
+        transform: scale(1.05);
+      }
+    }
+
+    &:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease;
+    }
   `,
   sentMessage: css`
-    background-color: #36b37e !important;
     align-self: flex-end;
-    color: white;
-    border-radius: 14px 14px 4px 14px;
+    background-color: rgba(54, 179, 126, 0.15);
+    border: 1px solid rgba(54, 179, 126, 0.2);
+    transform-origin: center right;
+
+    &:hover {
+      background-color: rgba(54, 179, 126, 0.2);
+      box-shadow: 0 4px 12px rgba(54, 179, 126, 0.15);
+      transform: translateY(-2px) scale(1.01);
+    }
+
+    &:before {
+      background: linear-gradient(
+        45deg,
+        transparent 0%,
+        rgba(54, 179, 126, 0.1) 100%
+      );
+    }
   `,
   receivedMessage: css`
     align-self: flex-start;
-    background-color: rgba(255, 255, 255, 0.06) !important;
-    border-radius: 14px 14px 14px 4px;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    }
   `,
-  inputContainer: css`
-    padding: 12px 16px;
-    background-color: rgba(255, 255, 255, 0.02);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  `,
-  inputActions: css`
-    display: flex;
-    align-items: center;
-    gap: 4px;
+  messageTime: css`
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.55rem;
+    opacity: 0.6;
+    margin-bottom: 1px;
+    white-space: nowrap;
+    align-self: flex-end;
+    margin-top: 2px;
+    transition: opacity 0.2s ease;
+    position: relative;
+    padding-left: 16px;
+
+    &:before {
+      content: "•";
+      position: absolute;
+      left: 6px;
+      opacity: 0.7;
+    }
   `,
   typingIndicator: css`
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin-bottom: 8px;
-    margin-left: 16px;
-  `,
-  typingDot: css`
-    width: 4px;
-    height: 4px;
-    background-color: rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    animation: typing 1.4s infinite ease-in-out;
+    padding: 8px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    margin: 4px 0;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
 
-    &:nth-of-type(2) {
-      animation-delay: 0.2s;
+    span {
+      width: 4px;
+      height: 4px;
+      background: currentColor;
+      border-radius: 50%;
+      display: inline-block;
+      animation: typingDot 1.4s infinite;
+
+      &:nth-of-type(2) {
+        animation-delay: 0.2s;
+      }
+      &:nth-of-type(3) {
+        animation-delay: 0.4s;
+      }
     }
 
-    &:nth-of-type(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes typing {
+    @keyframes typingDot {
       0%,
       60%,
       100% {
@@ -178,312 +385,269 @@ const styles = {
       }
     }
   `,
+  inputArea: css`
+    padding: 16px 20px;
+    background-color: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    position: relative;
+
+    &:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+    }
+
+    @media (max-width: 600px) {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 16px;
+    }
+  `,
+  inputWrapper: css`
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  `,
+  actionsWrapper: css`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  `,
+  dateHeader: css`
+    text-align: center;
+    padding: 20px 0 12px;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.65rem;
+    position: relative;
+    margin: 0;
+
+    span {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+
+      &:before,
+      &:after {
+        content: "";
+        height: 1px;
+        width: 24px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    @media (min-width: 600px) {
+      span {
+        &:before,
+        &:after {
+          width: 48px;
+        }
+      }
+    }
+  `,
 };
 
-interface IChatAreaProps {
-  selectedChat?: IChat;
-  input: string;
-  messages: IMessage[];
-  onInputChange: (value: string) => void;
-  onSend: () => void;
-  onKeyPress: (event: React.KeyboardEvent) => void;
-}
-
-// Helper function to group messages by date
-const TypingIndicator = () => (
-  <Box className={styles.typingIndicator}>
-    <Typography
-      variant="caption"
-      color="text.secondary"
-      sx={{ fontSize: "0.75rem" }}
-    >
-      typing
-    </Typography>
-    <span className={styles.typingDot} />
-    <span className={styles.typingDot} />
-    <span className={styles.typingDot} />
-  </Box>
-);
-
-const ChatArea = ({
+const ChatArea: React.FC<ChatAreaProps> = ({
   selectedChat,
-  input,
   messages,
+  input,
   onInputChange,
   onSend,
   onKeyPress,
-}: IChatAreaProps) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+}) => {
+  const currentUserId = getLoggedUserId();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "instant" });
-    }
-  }, [messages, selectedChat]);
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+    scrollToBottom();
+  }, [messages]);
 
   if (!selectedChat) {
     return (
-      <Box
-        className={styles.container}
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        sx={{
-          flex: 1,
-          minHeight: 0,
-          background: "#1a1a1e",
-        }}
-      >
+      <Box className={styles.container}>
         <Box
           sx={{
-            textAlign: "center",
-            color: "rgba(255,255,255,0.5)",
-            p: 4,
-            borderRadius: 2,
-            background: "rgba(255,255,255,0.02)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            boxShadow: "0 2px 16px 0 rgba(0,0,0,0.10)",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
           }}
         >
+          {" "}
           <Typography
-            variant="h6"
-            fontWeight={600}
-            sx={{ mb: 1, fontSize: "1.2rem" }}
+            sx={{
+              color: "rgba(255, 255, 255, 0.5)",
+              fontSize: "0.85rem",
+              textAlign: "center",
+              maxWidth: "80%",
+              lineHeight: 1.5,
+            }}
           >
             Select a chat to start messaging
-          </Typography>
-          <Typography variant="body2" sx={{ fontSize: "0.95rem" }}>
-            Choose a conversation from the list or start a new one.
           </Typography>
         </Box>
       </Box>
     );
   }
 
-  const isTyping = false; // TODO: Implement typing indicator logic
+  const otherUser =
+    selectedChat.users.find((u) => u.user_id !== currentUserId) ??
+    selectedChat.users[0];
+  const userName = getFullName(otherUser.first_name, otherUser.last_name);
+  const avatarText =
+    `${otherUser.first_name[0]}${otherUser.last_name[0]}`.toUpperCase();
 
   return (
     <Box className={styles.container}>
       <Box className={styles.header}>
         <Box className={styles.headerLeft}>
-          <ListItemAvatar>
-            <Avatar
-              sx={{
-                bgcolor: "primary.main",
-                color: "#fff",
-                width: 40,
-                height: 40,
-                fontSize: "0.95rem",
-              }}
-            >
-              {getAvatarName(
-                selectedChat.users[0].first_name,
-                selectedChat.users[0].last_name,
-              )}
-            </Avatar>
-          </ListItemAvatar>
+          <Avatar
+            sx={{
+              background: "linear-gradient(45deg, #36B37E 30%, #2C9066 90%)",
+              width: 32,
+              height: 32,
+              fontSize: "0.8rem",
+              position: "relative",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              "&::after": {
+                content: '""',
+                position: "absolute",
+                inset: -2,
+                padding: 2,
+                borderRadius: "50%",
+                background:
+                  "linear-gradient(45deg, rgba(54, 179, 126, 0.5), rgba(44, 144, 102, 0.5))",
+                WebkitMask:
+                  "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                WebkitMaskComposite: "xor",
+                maskComposite: "exclude",
+                animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+              },
+              "@keyframes pulse": {
+                "0%, 100%": {
+                  transform: "scale(1)",
+                  opacity: 1,
+                },
+                "50%": {
+                  transform: "scale(1.05)",
+                  opacity: 0.8,
+                },
+              },
+              "&:hover": {
+                transform: "scale(1.1) rotate(5deg)",
+                boxShadow: "0 4px 12px rgba(54, 179, 126, 0.25)",
+              },
+            }}
+          >
+            {avatarText}
+          </Avatar>
           <Box>
-            <Typography variant="subtitle1" component="p" fontWeight={500}>
-              {getFullName(
-                selectedChat.users[0].first_name,
-                selectedChat.users[0].last_name,
-              )}
-            </Typography>
-            <Typography
-              variant="caption"
-              component="p"
-              color="text.secondary"
-              sx={{ fontSize: "0.75rem" }}
-            >
-              Active now
-            </Typography>
+            <Typography className={styles.userName}>{userName}</Typography>
+            <Typography className={styles.status}>Online</Typography>{" "}
           </Box>
         </Box>
         <Box className={styles.headerRight}>
-          <Tooltip title="More options">
-            <IconButton size="small" onClick={handleMenuOpen}>
-              <MoreVertRoundedIcon sx={{ fontSize: 20 }} />
-            </IconButton>
-          </Tooltip>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-            sx={{
-              "& .MuiList-root": {
-                paddingTop: 0,
-                paddingBottom: 0,
-              },
-            }}
-            slotProps={{
-              paper: {
-                sx: {
-                  backgroundColor: "#23232b",
-                  color: "#fff",
-                  borderRadius: 2,
-                  boxShadow: "0 4px 24px 0 rgba(0,0,0,0.25)",
-                  minWidth: 160,
-                  p: 0,
-                  border: "1px solid rgba(255,255,255,0.08)",
-                },
-              },
+          <button
+            className={styles.logoutButton}
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = "/";
             }}
           >
-            <Tooltip title="Coming soon" arrow placement="top">
-              <span>
-                <MenuItem
-                  disabled
-                  sx={{
-                    borderRadius: 1,
-                    mx: 0.5,
-                    my: 0.5,
-                    fontSize: "0.97rem",
-                    color: "#fff",
-                    opacity: 0.5,
-                    pointerEvents: "none",
-                    transition: "background 0.2s",
-                  }}
-                >
-                  Clear Chat
-                </MenuItem>
-              </span>
-            </Tooltip>
-            <Tooltip title="Coming soon" arrow placement="top">
-              <span>
-                <MenuItem
-                  disabled
-                  sx={{
-                    borderRadius: 1,
-                    mx: 0.5,
-                    my: 0.5,
-                    fontSize: "0.97rem",
-                    color: "#fff",
-                    opacity: 0.5,
-                    pointerEvents: "none",
-                    transition: "background 0.2s, color 0.2s",
-                  }}
-                >
-                  Delete Chat
-                </MenuItem>
-              </span>
-            </Tooltip>
-            <Tooltip title="Coming soon" arrow placement="top">
-              <span>
-                <MenuItem
-                  disabled
-                  sx={{
-                    borderRadius: 1,
-                    mx: 0.5,
-                    my: 0.5,
-                    fontSize: "0.97rem",
-                    color: "#fff",
-                    opacity: 0.5,
-                    pointerEvents: "none",
-                    transition: "background 0.2s, color 0.2s",
-                  }}
-                >
-                  Block User
-                </MenuItem>
-              </span>
-            </Tooltip>
-          </Menu>
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+            </svg>
+          </button>
         </Box>
-      </Box>{" "}
-      <Box className={styles.messagesContainer}>
-        {messages.map((msg) => (
-          <Paper
-            key={msg.message_id}
-            className={`${styles.message} ${
-              msg.user_id === getLoggedUserId()
-                ? styles.sentMessage
-                : styles.receivedMessage
-            }`}
-            elevation={0}
-          >
-            {" "}
-            <Box sx={{ flex: 1 }}>
-              <Typography
-                variant="body2"
-                sx={{
-                  fontSize: "0.85rem",
-                  lineHeight: 1.4,
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                  paddingRight: "48px",
-                }}
-              >
-                {msg.content}
-              </Typography>
-              <Typography
-                variant="caption"
-                sx={{
-                  fontSize: "0.65rem",
-                  opacity: 0.7,
-                  position: "absolute",
-                  right: "12px",
-                  bottom: "8px",
-                }}
-              >
-                {getFormattedDate(new Date(msg.created_at))}
-              </Typography>
-            </Box>
-          </Paper>
-        ))}
-        {isTyping && <TypingIndicator />}
-        <div ref={messagesEndRef} />
       </Box>
-      <Box className={styles.inputContainer}>
-        <Box className={styles.inputActions}>
-          <Tooltip title="Coming soon: Attach files" arrow>
-            <span>
-              <IconButton
-                size="small"
-                disabled
-                sx={{ opacity: 0.5, pointerEvents: "none" }}
+
+      <Box className={styles.messagesArea}>
+        {messages.map((message, index) => {
+          const messageDate = getFormattedDate(new Date(message.created_at));
+          const messageTime = getTimeString(new Date(message.created_at));
+          const showDateSeparator =
+            index === 0 ||
+            new Date(message.created_at).toDateString() !==
+              new Date(messages[index - 1].created_at).toDateString();
+
+          return (
+            <Box key={message.message_id} className={styles.messageWrapper}>
+              {showDateSeparator && (
+                <div className={styles.dateHeader}>
+                  <span>{messageDate}</span>
+                </div>
+              )}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent:
+                    message.user_id === currentUserId
+                      ? "flex-end"
+                      : "flex-start",
+                  width: "100%",
+                }}
               >
-                <AttachFileRoundedIcon sx={{ fontSize: 20 }} />
-              </IconButton>
-            </span>
-          </Tooltip>
-          <Tooltip title="Coming soon: Emoji picker" arrow>
-            <span>
-              <IconButton
-                size="small"
-                disabled
-                sx={{ opacity: 0.5, pointerEvents: "none" }}
-              >
-                <SentimentSatisfiedRoundedIcon sx={{ fontSize: 20 }} />
-              </IconButton>
-            </span>
-          </Tooltip>
+                <Box
+                  className={`${styles.message} ${
+                    message.user_id === currentUserId
+                      ? styles.sentMessage
+                      : styles.receivedMessage
+                  }`}
+                >
+                  <span>{message.content}</span>
+                  <span className={styles.messageTime}>{messageTime}</span>
+                </Box>
+              </Box>
+            </Box>
+          );
+        })}
+        {/* Uncomment the line below to show typing indicator */}
+        {/* <TypingIndicator /> */}
+        <div ref={messagesEndRef} style={{ height: 1 }} />
+      </Box>
+
+      <Box className={styles.inputArea}>
+        <Box className={styles.inputWrapper}>
+          <Box className={styles.actionsWrapper}>
+            <ActionButton size="small">
+              <AttachFileRoundedIcon />
+            </ActionButton>
+            <ActionButton size="small">
+              <SentimentSatisfiedRoundedIcon />
+            </ActionButton>
+          </Box>
+          <MessageTextField
+            fullWidth
+            multiline
+            maxRows={4}
+            placeholder="Type a message..."
+            value={input}
+            onChange={onInputChange}
+            onKeyPress={onKeyPress}
+          />
+          <SendButton onClick={onSend}>
+            <SendRoundedIcon />
+          </SendButton>
         </Box>
-        <StyledTextField
-          fullWidth
-          multiline
-          maxRows={4}
-          placeholder="Type a message..."
-          value={input}
-          onChange={(e) => onInputChange(e.target.value)}
-          onKeyDown={onKeyPress}
-          variant="outlined"
-          size="small"
-        />
-        <StyledSendButton
-          onClick={onSend}
-          color="primary"
-          disabled={input.trim().length === 0}
-        >
-          <SendRoundedIcon sx={{ color: "#fff", fontSize: 24 }} />
-        </StyledSendButton>
       </Box>
     </Box>
   );
