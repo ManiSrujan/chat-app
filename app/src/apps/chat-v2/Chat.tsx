@@ -105,6 +105,7 @@ const Chat = () => {
           chats={chats}
           selectedChat={selectedChat}
           onChatSelect={handleChatSelect}
+          setChats={setChats}
         />
         <ChatArea
           selectedChat={selectedChat}

@@ -28,4 +28,5 @@ export interface IChatV2Props {
   chats: IChat[];
   selectedChat?: IChat;
   onChatSelect: (chat: IChat) => void;
+  setChats: React.Dispatch<React.SetStateAction<IChat[]>>;
 }

@@ -45,8 +45,7 @@ const textFieldStyles = {
 };
 
 const SignUp = () => {
-  const { formData, formErrors, handleChange, handleBlur, handleSubmit } =
-    useSignUp();
+  const { formData, formErrors, handleChange, handleSubmit } = useSignUp();
 
   return (
     <Box
@@ -131,7 +130,6 @@ const SignUp = () => {
                 autoFocus
                 value={formData.firstname}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 error={!!formErrors.firstname}
                 helperText={formErrors.firstname}
                 sx={textFieldStyles}
@@ -145,7 +143,6 @@ const SignUp = () => {
                 autoComplete="family-name"
                 value={formData.lastname}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 error={!!formErrors.lastname}
                 helperText={formErrors.lastname}
                 sx={textFieldStyles}
@@ -161,7 +158,6 @@ const SignUp = () => {
               sx={{ ...textFieldStyles, mb: 3 }}
               value={formData.username}
               onChange={handleChange}
-              onBlur={handleBlur}
               error={!!formErrors.username}
               helperText={formErrors.username}
             />
@@ -176,7 +172,6 @@ const SignUp = () => {
               sx={{ ...textFieldStyles, mb: 3 }}
               value={formData.password}
               onChange={handleChange}
-              onBlur={handleBlur}
               error={!!formErrors.password}
               helperText={formErrors.password}
             />
@@ -191,7 +186,6 @@ const SignUp = () => {
               sx={{ ...textFieldStyles, mb: 3 }}
               value={formData.confirmPassword}
               onChange={handleChange}
-              onBlur={handleBlur}
               error={!!formErrors.confirmPassword}
               helperText={formErrors.confirmPassword}
             />

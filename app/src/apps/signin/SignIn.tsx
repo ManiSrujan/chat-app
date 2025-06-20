@@ -46,8 +46,7 @@ const textFieldStyles = {
 };
 
 const SignIn = () => {
-  const { formData, formErrors, handleChange, handleBlur, handleSubmit } =
-    useSignIn();
+  const { formData, formErrors, handleChange, handleSubmit } = useSignIn();
 
   return (
     <Box
@@ -131,7 +130,6 @@ const SignIn = () => {
               sx={{ ...textFieldStyles, mb: 3 }}
               value={formData.username}
               onChange={handleChange}
-              onBlur={handleBlur}
               error={!!formErrors.username}
               helperText={formErrors.username}
               autoFocus
@@ -148,7 +146,6 @@ const SignIn = () => {
               sx={{ ...textFieldStyles, mb: 3 }}
               value={formData.password}
               onChange={handleChange}
-              onBlur={handleBlur}
               error={!!formErrors.password}
               helperText={formErrors.password}
               variant="outlined"
