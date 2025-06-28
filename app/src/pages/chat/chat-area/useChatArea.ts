@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { IChat, IMessage } from "../chat.types";
 import restClient from "../../../common/rest-client/restClient";
 import { getEnvConfig } from "../../../common/env-config/envConfig";
@@ -9,6 +9,8 @@ import { getLoggedUserId, getLoggedUserName } from "src/common/user/user";
 interface IUseChatAreaReturn {
   input: string;
   messages: IMessage[];
+  scrollRef: React.MutableRefObject<HTMLDivElement | null>;
+  loading: boolean;
   handleInputChange: (value: string) => void;
   handleSend: (client: websocket.w3cwebsocket | null) => void;
   handleKeyPress: (
@@ -22,12 +24,15 @@ export const useChatArea = (
   selectedChat: IChat | undefined,
   changeLastMessage: (chatId: string, lastMessage: IMessage) => void,
 ): IUseChatAreaReturn => {
+  const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [input, setInput] = useState("");
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     async function fetchMessages() {
       try {
+        setLoading(true);
         if (!selectedChat) {
           return;
         }
@@ -37,11 +42,22 @@ export const useChatArea = (
         setMessages(response.data);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchMessages();
   }, [selectedChat]);
+
+  useEffect(() => {
+    if (scrollRef.current && !loading) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "auto",
+      });
+    }
+  }, [loading]);
 
   const handleInputChange = (value: string) => {
     setInput(value);
@@ -101,6 +117,8 @@ export const useChatArea = (
   return {
     input,
     messages,
+    scrollRef,
+    loading,
     handleInputChange,
     handleSend,
     handleKeyPress,

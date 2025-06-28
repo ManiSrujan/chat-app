@@ -15,6 +15,7 @@ const Chat = (): JSX.Element => {
     handleKeyPress,
     handleSend,
     addMessageToChat,
+    scrollRef,
   } = useChatArea(selectedChat, changeLastMessage);
   const { client } = useSocketCommunication(addMessageToChat);
 
@@ -31,6 +32,7 @@ const Chat = (): JSX.Element => {
           handleInputChange={(e) => handleInputChange(e.target.value)}
           handleSend={() => handleSend(client)}
           handleKeyPress={(e) => handleKeyPress(e, client)}
+          scrollRef={scrollRef}
         />
       </Box>
     </Flex>

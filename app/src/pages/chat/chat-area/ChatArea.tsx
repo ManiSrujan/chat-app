@@ -11,6 +11,7 @@ const ChatArea = ({
   handleInputChange,
   handleSend,
   handleKeyPress,
+  scrollRef,
 }: {
   selectedChat: IChat | undefined;
   input: string;
@@ -18,6 +19,7 @@ const ChatArea = ({
   handleInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleSend: () => void;
   handleKeyPress: (event: React.KeyboardEvent) => void;
+  scrollRef: React.MutableRefObject<HTMLDivElement | null>;
 }): JSX.Element => {
   if (!selectedChat) {
     return (
@@ -40,7 +42,7 @@ const ChatArea = ({
           description="online"
         />
       </Card>
-      <ScrollArea type="hover" scrollbars="vertical">
+      <ScrollArea type="hover" scrollbars="vertical" ref={scrollRef}>
         <Card size="3" style={{ flexGrow: "1" }}>
           <Messages messages={messages} />
         </Card>
