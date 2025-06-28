@@ -19,6 +19,14 @@ export function getLoggedUserName(): string | null {
   return null;
 }
 
+export function getAccessToken(): string | null {
+  const loginConfig = getItem<ILoginConfig>(StorageKeys.LOGIN_CONFIG);
+  if (loginConfig) {
+    return loginConfig.accessToken;
+  }
+  return null;
+}
+
 export function getFullName(firstName: string, lastName: string) {
   return `${firstName.charAt(0).toUpperCase() + firstName.slice(1)} ${lastName.charAt(0).toUpperCase() + lastName.slice(1)}`;
 }

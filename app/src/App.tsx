@@ -1,29 +1,22 @@
 import { Route, Switch } from "wouter";
-import Chat from "./apps/chat-v2/Chat";
-import SignUp from "./apps/signup";
-import SignIn from "./apps/signin";
-import { css } from "@emotion/css";
-import "@fontsource/roboto/300.css";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
-import "./normalize.css";
+import SignUp from "./pages/sign-up";
+import SignIn from "./pages/sign-in";
+import { Routes } from "./common/constants";
+import "./App.css";
+import Chat from "./pages/chat";
+import { Box, Theme } from "@radix-ui/themes";
 
 const App = (): JSX.Element => {
   return (
-    <div
-      className={css`
-        div {
-          box-sizing: border-box;
-        }
-      `}
-    >
-      <Switch>
-        <Route path="/" component={SignIn} />
-        <Route path="/signup" component={SignUp} />
-        <Route path="/chat" component={Chat} />
-      </Switch>
-    </div>
+    <Theme appearance={"dark"} panelBackground={"translucent"}>
+      <Box width="100vw" height="100vh">
+        <Switch>
+          <Route path={Routes.SignUp} component={SignUp} />
+          <Route path={Routes.SignIn} component={SignIn} />
+          <Route path={Routes.Chat} component={Chat} />
+        </Switch>
+      </Box>
+    </Theme>
   );
 };
 

@@ -8,11 +8,11 @@ export interface IChat {
   chat_id: string;
   users: IUser[];
   last_message: {
-    message_id: string;
-    user_id: string;
-    user_name: string;
-    content: string;
-    created_at: string;
+    message_id: string | null;
+    user_id: string | null;
+    user_name: string | null;
+    content: string | null;
+    created_at: string | null;
   };
 }
 
