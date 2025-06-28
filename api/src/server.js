@@ -275,7 +275,11 @@ app.post("/auth/signup", async function signUpUser(req, res) {
     await signUp(username, firstname, lastname, password);
     res.sendStatus(201);
   } catch (error) {
-    res.status(500).send({ message: getErrorMessage(error) });
+    if (error.message === ERROR_MESSAGES.UserNameExists) {
+      res.status(409).send({ message: getErrorMessage(error) });
+    } else {
+      res.status(500).send({ message: getErrorMessage(error) });
+    }
   }
 });
 

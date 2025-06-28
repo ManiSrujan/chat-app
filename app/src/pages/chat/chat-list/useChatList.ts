@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
-import { IChat } from "../chat.types";
 import restClient from "../../../common/rest-client/restClient";
 import { getEnvConfig } from "../../../common/env-config/envConfig";
 import { ENV_CONFIG_KEY } from "../../../common/env-config/constants";
-import { getLoggedUserId } from "../../../common/utils/user";
+import { getLoggedUserId } from "src/common/user/user";
+import { IChat, IMessage } from "../chat.types";
 
 interface IUseChatListReturn {
   chats: IChat[];
   selectedChat: IChat | undefined;
-  handleChatSelect: (chat: IChat) => void;
   loading: boolean;
   error: string | null;
-  setChats: React.Dispatch<React.SetStateAction<IChat[]>>;
+  handleChatSelect: (chat: IChat) => void;
+  changeLastMessage: (chatId: string, lastMessage: IMessage) => void;
 }
 
 const useChatList = (): IUseChatListReturn => {
@@ -41,13 +41,26 @@ const useChatList = (): IUseChatListReturn => {
     setSelectedChat(chat);
   };
 
+  const changeLastMessage = (chatId: string, lastMessage: IMessage) => {
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat.chat_id === chatId
+          ? {
+              ...chat,
+              last_message: lastMessage,
+            }
+          : chat,
+      ),
+    );
+  };
+
   return {
     chats,
     selectedChat,
-    handleChatSelect,
     loading,
     error,
-    setChats,
+    handleChatSelect,
+    changeLastMessage,
   };
 };
 

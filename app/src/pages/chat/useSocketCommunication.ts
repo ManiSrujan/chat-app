@@ -7,7 +7,7 @@ import { ILoginConfig, StorageKeys } from "../../common/types/storage.types";
 import { IMessage } from "./chat.types";
 
 const useSocketCommunication = (
-  setMessages: React.Dispatch<React.SetStateAction<IMessage[]>>,
+  addMessageToChat: (message: IMessage) => void,
 ): { client: websocket.w3cwebsocket | null } => {
   const client = useRef<websocket.w3cwebsocket | null>(null);
 
@@ -33,16 +33,13 @@ const useSocketCommunication = (
 
         switch (type) {
           case "message":
-            setMessages((prevMessages) => [
-              ...prevMessages,
-              {
-                content: data.content,
-                created_at: data.created_at,
-                message_id: data.message_id,
-                user_id: data.user_id,
-                user_name: data.user_name,
-              },
-            ]);
+            addMessageToChat({
+              content: data.content,
+              created_at: data.created_at,
+              message_id: data.message_id,
+              user_id: data.user_id,
+              user_name: data.user_name,
+            });
             break;
         }
       }

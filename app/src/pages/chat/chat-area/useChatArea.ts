@@ -4,36 +4,37 @@ import restClient from "../../../common/rest-client/restClient";
 import { getEnvConfig } from "../../../common/env-config/envConfig";
 import { ENV_CONFIG_KEY } from "../../../common/env-config/constants";
 import websocket from "websocket";
-import { getLoggedUserId, getLoggedUserName } from "../../../common/utils/user";
+import { getLoggedUserId, getLoggedUserName } from "src/common/user/user";
 
 interface IUseChatAreaReturn {
   input: string;
+  messages: IMessage[];
   handleInputChange: (value: string) => void;
   handleSend: (client: websocket.w3cwebsocket | null) => void;
   handleKeyPress: (
     event: React.KeyboardEvent,
     client: websocket.w3cwebsocket | null,
   ) => void;
+  addMessageToChat: (message: IMessage) => void;
 }
 
 export const useChatArea = (
-  setMessages: React.Dispatch<React.SetStateAction<IMessage[]>>,
-  setChats: React.Dispatch<React.SetStateAction<IChat[]>>,
-  selectedChat: IChat | null | undefined,
+  selectedChat: IChat | undefined,
+  changeLastMessage: (chatId: string, lastMessage: IMessage) => void,
 ): IUseChatAreaReturn => {
+  const [messages, setMessages] = useState<IMessage[]>([]);
   const [input, setInput] = useState("");
 
   useEffect(() => {
     async function fetchMessages() {
       try {
-        if (selectedChat) {
-          const response = await restClient.get<IMessage[]>(
-            `${getEnvConfig(ENV_CONFIG_KEY.API)}/chat/${selectedChat.chat_id}/messages`,
-          );
-          setMessages(response.data);
-        } else {
-          setMessages([]);
+        if (!selectedChat) {
+          return;
         }
+        const response = await restClient.get<IMessage[]>(
+          `${getEnvConfig(ENV_CONFIG_KEY.API)}/chat/${selectedChat.chat_id}/messages`,
+        );
+        setMessages(response.data);
       } catch (error) {
         console.error(error);
       }
@@ -44,6 +45,14 @@ export const useChatArea = (
 
   const handleInputChange = (value: string) => {
     setInput(value);
+  };
+
+  const addMessageToChat = (message: IMessage) => {
+    if (!selectedChat) {
+      return;
+    }
+    setMessages((prevMessages) => [...prevMessages, message]);
+    changeLastMessage(selectedChat.chat_id, message);
   };
 
   const handleSend = (client: websocket.w3cwebsocket | null) => {
@@ -73,17 +82,7 @@ export const useChatArea = (
         user_id: userId,
         user_name: userName,
       };
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-      setChats((prevChats) =>
-        prevChats.map((chat) =>
-          chat.chat_id === selectedChat.chat_id
-            ? {
-                ...chat,
-                last_message: newMessage,
-              }
-            : chat,
-        ),
-      );
+      addMessageToChat(newMessage);
     }
 
     setInput("");
@@ -101,9 +100,11 @@ export const useChatArea = (
 
   return {
     input,
+    messages,
     handleInputChange,
     handleSend,
     handleKeyPress,
+    addMessageToChat,
   };
 };
 
