@@ -7,4 +7,6 @@ export interface ILoginResponse {
   refreshToken: string;
   userId: string;
   userName: string;
+  firstName: string;
+  lastName: string;
 }

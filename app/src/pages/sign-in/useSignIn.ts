@@ -39,7 +39,14 @@ const useSignIn = () => {
           password: formData.password.value,
         },
       );
-      const { accessToken, refreshToken, userId, userName } = response.data;
+      const {
+        accessToken,
+        refreshToken,
+        userId,
+        userName,
+        firstName,
+        lastName,
+      } = response.data;
 
       // Store tokens and user info
       setItem(StorageKeys.LOGIN_CONFIG, {
@@ -47,6 +54,8 @@ const useSignIn = () => {
         refreshToken,
         userId,
         userName,
+        firstName,
+        lastName,
       });
 
       // Redirect to chat

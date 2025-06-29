@@ -272,6 +272,8 @@ app.post("/auth/login", async function loginUser(req, res) {
       refreshToken,
       userId: userDetails[0].user_id,
       userName: userDetails[0].user_name,
+      firstName: userDetails[0].first_name,
+      lastName: userDetails[0].last_name,
     });
   } catch (error) {
     res.status(500).send({ message: getErrorMessage(error) });

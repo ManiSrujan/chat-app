@@ -25,4 +25,8 @@ function removeItem(key: string): void {
   }
 }
 
-export { setItem, getItem, removeItem };
+function clearLS(): void {
+  localStorage.clear();
+}
+
+export { setItem, getItem, removeItem, clearLS };

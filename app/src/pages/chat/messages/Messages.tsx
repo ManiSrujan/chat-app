@@ -14,6 +14,15 @@ const DateSeparator = ({ date }: { date: string }): JSX.Element => {
 };
 
 const Messages = ({ messages }: { messages: IMessage[] }): JSX.Element => {
+  if (!messages.length) {
+    return (
+      <Flex direction="column" height="100%" align="center" justify="center">
+        <Text size="4" weight="regular">
+          No Messages yet
+        </Text>
+      </Flex>
+    );
+  }
   return (
     <Flex direction="column" gap="4">
       {messages.map((message, index) => {
