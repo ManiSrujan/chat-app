@@ -89,6 +89,7 @@ wsServer.on("request", async function handleWSRequest(request) {
                     message_id: response.message_id,
                     user_id: response.user_id,
                     user_name: srcUserName,
+                    chat_id: chatId,
                   },
                 }),
               );

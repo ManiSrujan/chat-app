@@ -22,6 +22,7 @@ export interface IMessage {
   content: string;
   created_at: string;
   user_name: string;
+  chat_id: string;
 }
 
 export interface IChatV2Props {
