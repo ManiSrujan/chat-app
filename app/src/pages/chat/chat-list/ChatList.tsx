@@ -3,13 +3,16 @@ import ChatListItem from "./ChatListItem";
 import ChatSearch from "./ChatSearch";
 import { IChat } from "../chat.types";
 import Profile from "./Profile";
+import UserSearch from "../user-search/UserSearch";
 
 const ChatList = ({
   chats,
   onSelect,
+  onUserSelect,
 }: {
   chats: IChat[];
   onSelect: (chat: IChat) => void;
+  onUserSelect: (srcUserId: string, targetUserId: string) => Promise<void>;
 }): JSX.Element => {
   return (
     <Card
@@ -22,7 +25,10 @@ const ChatList = ({
       <Box p="4">
         <Flex direction="column" gap="4">
           <Flex align="center" justify="between">
-            <Text weight="medium">Chats</Text>
+            <Flex align="center" gap="2">
+              <Text weight="medium">Chats</Text>
+              <UserSearch onUserSelect={onUserSelect} />
+            </Flex>
             <Profile />
           </Flex>
           <ChatSearch />

@@ -22,13 +22,19 @@ async function createUser(username, firstname, lastname, password) {
   }
 }
 
-async function getAllUsers() {
+async function getAllUsers(search, pageNumber, pageSize) {
   const client = createClient();
 
   try {
     await client.connect();
 
-    const result = await client.query("SELECT * FROM appuser");
+    const result = await client.query(
+      `SELECT user_id, first_name, last_name, user_name FROM appuser 
+       WHERE first_name ILIKE '%' || $1 || '%' OR 
+       last_name ILIKE '%' || $1 || '%' OR 
+       user_name ILIKE '%' || $1 || '%' LIMIT $2 OFFSET $3`,
+      [search, pageSize, (pageNumber - 1) * pageSize],
+    );
 
     return result.rows;
   } catch (error) {

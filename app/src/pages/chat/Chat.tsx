@@ -6,8 +6,13 @@ import useChatArea from "./chat-area/useChatArea";
 import useSocketCommunication from "./useSocketCommunication";
 
 const Chat = (): JSX.Element => {
-  const { chats, selectedChat, handleChatSelect, changeLastMessage } =
-    useChatList();
+  const {
+    chats,
+    selectedChat,
+    handleChatSelect,
+    changeLastMessage,
+    createChat,
+  } = useChatList();
   const {
     messages,
     input,
@@ -23,7 +28,11 @@ const Chat = (): JSX.Element => {
   return (
     <Flex p="4" height="100vh" gap="2">
       <Box width="300px">
-        <ChatList chats={chats} onSelect={handleChatSelect} />
+        <ChatList
+          chats={chats}
+          onSelect={handleChatSelect}
+          onUserSelect={createChat}
+        />
       </Box>
       <Box height="100%" flexGrow="1">
         <ChatArea
