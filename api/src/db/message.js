@@ -70,7 +70,7 @@ async function getAllMessage(
 
     // TODO: Improve performance of this query by using indexes
     const result = await client.query(
-      `SELECT message_id, message.user_id, user_name, content, created_at 
+      `SELECT message_id, message.user_id, user_name, content, created_at, chat_id 
       FROM message JOIN appuser ON message.user_id = appuser.user_id 
       WHERE chat_id = $1 ORDER BY message.created_at ${sortDir} LIMIT $2 OFFSET $3`,
       [chatId, pageSize, (pageNumber - 1) * pageSize],

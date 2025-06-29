@@ -35,6 +35,7 @@ const useSocketCommunication = (
               message_id: data.message_id,
               user_id: data.user_id,
               user_name: data.user_name,
+              chat_id: data.chat_id,
             });
             break;
         }

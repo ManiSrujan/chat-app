@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { IChat, IMessage } from "../chat.types";
 import restClient from "../../../common/rest-client/restClient";
 import { getEnvConfig } from "../../../common/env-config/envConfig";
@@ -33,18 +33,27 @@ export const useChatArea = (
   const [pageNumber, setPageNumber] = useState(0);
   const scrolledHeight = useRef(0);
 
-  const { intersectionRef, isIntersecting } = useIntersectionObserver({
-    isObservable: selectedChat?.chat_id,
-  });
-
-  useEffect(() => {
+  function onIntersectionChange(isIntersecting: boolean) {
     if (isIntersecting) {
       if (scrollRef.current) {
         scrolledHeight.current = scrollRef.current.scrollHeight;
       }
-      setPageNumber(pageNumber + 1);
+      setPageNumber((pageNumber) => pageNumber + 1);
     }
-  }, [isIntersecting]);
+  }
+
+  const { intersectionRef } = useIntersectionObserver({
+    isObservable: selectedChat?.chat_id,
+    onIntersectionChange,
+  });
+
+  useMemo(
+    function resetMessages() {
+      setMessages([]);
+      setPageNumber(0);
+    },
+    [selectedChat],
+  );
 
   useEffect(() => {
     async function fetchMessages() {
@@ -65,7 +74,7 @@ export const useChatArea = (
     }
 
     fetchMessages();
-  }, [selectedChat, pageNumber]);
+  }, [pageNumber]);
 
   useEffect(() => {
     if (scrollRef.current && !loading) {
@@ -81,11 +90,8 @@ export const useChatArea = (
   };
 
   const addMessageToChat = (message: IMessage) => {
-    if (!selectedChat) {
-      return;
-    }
     setMessages((prevMessages) => [...prevMessages, message]);
-    changeLastMessage(selectedChat.chat_id, message);
+    changeLastMessage(message.chat_id, message);
     // setTimeout is added to get new scrollHeight after addming message to DOM
     setTimeout(() => {
       if (scrollRef.current) {
@@ -123,6 +129,7 @@ export const useChatArea = (
         message_id: "dummy-message-id",
         user_id: userId,
         user_name: userName,
+        chat_id: selectedChat.chat_id,
       };
       addMessageToChat(newMessage);
     }

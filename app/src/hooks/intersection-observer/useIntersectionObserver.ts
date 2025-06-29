@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from "react";
 
 interface IUseIntersectionObserver extends IntersectionObserverInit {
   isObservable?: unknown;
+  onIntersectionChange?: (isIntersecting: boolean) => void;
 }
 
 const useIntersectionObserver = ({
   isObservable = true,
+  onIntersectionChange,
   ...observerOptions
 }: IUseIntersectionObserver = {}) => {
   const [isIntersecting, setIsIntersecting] = useState(false);
@@ -19,8 +21,10 @@ const useIntersectionObserver = ({
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           setIsIntersecting(true);
+          onIntersectionChange?.(true);
         } else {
           setIsIntersecting(false);
+          onIntersectionChange?.(false);
         }
       });
     }, observerOptions);
