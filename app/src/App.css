@@ -19,13 +19,6 @@
 
   .rt-AvatarRoot {
     border: 2px solid var(--accent-6);
-
-    &.profile {
-      &:hover {
-        background-color: var(--accent-3);
-        cursor: pointer;
-      }
-    }
   }
 
   &.dark {

@@ -1,7 +1,8 @@
-import { Avatar, Box, Card, Flex, ScrollArea, Text } from "@radix-ui/themes";
+import { Box, Card, Flex, ScrollArea, Text } from "@radix-ui/themes";
 import ChatListItem from "./ChatListItem";
 import ChatSearch from "./ChatSearch";
 import { IChat } from "../chat.types";
+import Profile from "./Profile";
 
 const ChatList = ({
   chats,
@@ -22,7 +23,7 @@ const ChatList = ({
         <Flex direction="column" gap="4">
           <Flex align="center" justify="between">
             <Text weight="medium">Chats</Text>
-            <Avatar fallback="A" radius="full" className="profile" />
+            <Profile />
           </Flex>
           <ChatSearch />
         </Flex>

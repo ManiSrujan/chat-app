@@ -3,6 +3,8 @@ export interface ILoginConfig {
   refreshToken: string;
   userId: string;
   userName: string;
+  firstName: string;
+  lastName: string;
 }
 
 export enum StorageKeys {
