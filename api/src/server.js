@@ -122,7 +122,8 @@ async function verifyToken(req, res, next) {
 
 app.get("/users", verifyToken, async function getUsers(req, res) {
   try {
-    const users = await getAllUsers();
+    const { search = "", pageNumber = "1", pageSize = "25" } = req.query;
+    const users = await getAllUsers(search, pageNumber, pageSize);
     res.json(users);
   } catch (error) {
     res.status(500).send({ message: getErrorMessage(error) });

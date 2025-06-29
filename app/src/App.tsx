@@ -9,7 +9,7 @@ import { Box, Theme } from "@radix-ui/themes";
 const App = (): JSX.Element => {
   return (
     <Theme appearance={"dark"} panelBackground={"translucent"}>
-      <Box width="100vw" height="100vh">
+      <Box width="100vw" height="100vh" className="accent-background">
         <Switch>
           <Route path={Routes.SignUp} component={SignUp} />
           <Route path={Routes.SignIn} component={SignIn} />

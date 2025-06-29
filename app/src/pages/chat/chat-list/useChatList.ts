@@ -12,6 +12,7 @@ interface IUseChatListReturn {
   error: string | null;
   handleChatSelect: (chat: IChat) => void;
   changeLastMessage: (chatId: string, lastMessage: IMessage) => void;
+  createChat: (srcUserId: string, targetUserId: string) => Promise<void>;
 }
 
 const useChatList = (): IUseChatListReturn => {
@@ -20,21 +21,24 @@ const useChatList = (): IUseChatListReturn => {
   const [loading, setLoading] = useState(true);
   const [error] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function getChats() {
-      try {
-        const response = await restClient.get<IChat[]>(
-          `${getEnvConfig(ENV_CONFIG_KEY.API)}/user/${getLoggedUserId()}/chats`,
-        );
-        setChats(response.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+  async function getChats() {
+    try {
+      const response = await restClient.get<IChat[]>(
+        `${getEnvConfig(ENV_CONFIG_KEY.API)}/user/${getLoggedUserId()}/chats`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      return [];
+    } finally {
+      setLoading(false);
     }
+  }
 
-    getChats();
+  useEffect(() => {
+    (async () => {
+      setChats(await getChats());
+    })();
   }, []);
 
   const handleChatSelect = (chat: IChat) => {
@@ -54,6 +58,25 @@ const useChatList = (): IUseChatListReturn => {
     );
   };
 
+  async function createChat(srcUserId: string, targetUserId: string) {
+    try {
+      const response = await restClient.post<{ chatId: string }>(
+        `${getEnvConfig(ENV_CONFIG_KEY.API)}/chat`,
+        {
+          srcUser: srcUserId,
+          targetUser: targetUserId,
+        },
+      );
+      const updatedChats = await getChats();
+      setChats(updatedChats);
+      setSelectedChat(
+        updatedChats.find((chat) => chat.chat_id === response.data.chatId),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   return {
     chats,
     selectedChat,
@@ -61,6 +84,7 @@ const useChatList = (): IUseChatListReturn => {
     error,
     handleChatSelect,
     changeLastMessage,
+    createChat,
   };
 };
 
