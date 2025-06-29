@@ -34,7 +34,7 @@ const ChatList = ({
       >
         <Flex direction="column">
           {chats.map((chat) => (
-            <ChatListItem chat={chat} onSelect={onSelect} />
+            <ChatListItem key={chat.chat_id} chat={chat} onSelect={onSelect} />
           ))}
         </Flex>
       </ScrollArea>

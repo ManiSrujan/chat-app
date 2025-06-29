@@ -215,13 +215,22 @@ app.get(
   verifyToken,
   async function handleGetAllMessages(req, res) {
     try {
-      const { id, sortDir } = req.params;
+      const { id } = req.params;
+      let { sortDir = "desc", pageNumber = "1", pageSize = "25" } = req.query;
 
-      if (sortDir && (sortDir !== "asc" || sortDir !== "desc")) {
+      pageSize = parseInt(pageSize);
+      pageNumber = parseInt(pageNumber);
+      if (sortDir !== "asc" && sortDir !== "desc") {
         throw new Error("sortDir isnt valid value");
       }
+      if (isNaN(pageSize) || pageSize <= 0) {
+        throw new Error("pageSize should be a positive number");
+      }
+      if (isNaN(pageNumber) || pageNumber <= 0) {
+        throw new Error("pageNumber should be a positive number");
+      }
 
-      const messages = await getAllMessage(id, sortDir);
+      const messages = await getAllMessage(id, sortDir, pageNumber, pageSize);
       res.status(200).send(messages);
     } catch (error) {
       res.status(500).send({ message: getErrorMessage(error) });

@@ -5,12 +5,14 @@ import { getEnvConfig } from "../../../common/env-config/envConfig";
 import { ENV_CONFIG_KEY } from "../../../common/env-config/constants";
 import websocket from "websocket";
 import { getLoggedUserId, getLoggedUserName } from "src/common/user/user";
+import useIntersectionObserver from "src/hooks/intersection-observer";
 
 interface IUseChatAreaReturn {
   input: string;
   messages: IMessage[];
   scrollRef: React.MutableRefObject<HTMLDivElement | null>;
   loading: boolean;
+  intersectionRef: React.RefObject<HTMLDivElement>;
   handleInputChange: (value: string) => void;
   handleSend: (client: websocket.w3cwebsocket | null) => void;
   handleKeyPress: (
@@ -28,18 +30,33 @@ export const useChatArea = (
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [pageNumber, setPageNumber] = useState(0);
+  const scrolledHeight = useRef(0);
+
+  const { intersectionRef, isIntersecting } = useIntersectionObserver({
+    isObservable: selectedChat?.chat_id,
+  });
+
+  useEffect(() => {
+    if (isIntersecting) {
+      if (scrollRef.current) {
+        scrolledHeight.current = scrollRef.current.scrollHeight;
+      }
+      setPageNumber(pageNumber + 1);
+    }
+  }, [isIntersecting]);
 
   useEffect(() => {
     async function fetchMessages() {
       try {
         setLoading(true);
-        if (!selectedChat) {
+        if (!selectedChat || !pageNumber) {
           return;
         }
         const response = await restClient.get<IMessage[]>(
-          `${getEnvConfig(ENV_CONFIG_KEY.API)}/chat/${selectedChat.chat_id}/messages`,
+          `${getEnvConfig(ENV_CONFIG_KEY.API)}/chat/${selectedChat.chat_id}/messages?pageNumber=${pageNumber}&pageSize=25`,
         );
-        setMessages(response.data);
+        setMessages([...response.data.reverse(), ...messages]);
       } catch (error) {
         console.error(error);
       } finally {
@@ -48,12 +65,12 @@ export const useChatArea = (
     }
 
     fetchMessages();
-  }, [selectedChat]);
+  }, [selectedChat, pageNumber]);
 
   useEffect(() => {
     if (scrollRef.current && !loading) {
       scrollRef.current.scrollTo({
-        top: scrollRef.current.scrollHeight,
+        top: scrollRef.current.scrollHeight - scrolledHeight.current,
         behavior: "auto",
       });
     }
@@ -69,6 +86,15 @@ export const useChatArea = (
     }
     setMessages((prevMessages) => [...prevMessages, message]);
     changeLastMessage(selectedChat.chat_id, message);
+    // setTimeout is added to get new scrollHeight after addming message to DOM
+    setTimeout(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTo({
+          top: scrollRef.current.scrollHeight,
+          behavior: "auto",
+        });
+      }
+    }, 0);
   };
 
   const handleSend = (client: websocket.w3cwebsocket | null) => {
@@ -119,6 +145,7 @@ export const useChatArea = (
     messages,
     scrollRef,
     loading,
+    intersectionRef,
     handleInputChange,
     handleSend,
     handleKeyPress,
