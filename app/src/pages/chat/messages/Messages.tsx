@@ -2,16 +2,13 @@ import { Flex, Separator, Text } from "@radix-ui/themes";
 import { IMessage } from "../chat.types";
 import { getFormattedDate, getTimeString } from "src/common/date/date";
 import MessageItem from "./MessageItem";
-import { CommitIcon } from "@radix-ui/react-icons";
 
 const DateSeparator = ({ date }: { date: string }): JSX.Element => {
   return (
     <Flex align="center" gap="3" style={{ color: "var(--gray-11)" }}>
-      <CommitIcon color="gray" />
       <Separator size="3"></Separator>
       <Text size="1">{date}</Text>
       <Separator size="3"></Separator>
-      <CommitIcon color="gray" />
     </Flex>
   );
 };

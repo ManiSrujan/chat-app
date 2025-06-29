@@ -12,6 +12,7 @@ const ChatArea = ({
   handleSend,
   handleKeyPress,
   scrollRef,
+  intersectionRef,
 }: {
   selectedChat: IChat | undefined;
   input: string;
@@ -20,6 +21,7 @@ const ChatArea = ({
   handleSend: () => void;
   handleKeyPress: (event: React.KeyboardEvent) => void;
   scrollRef: React.MutableRefObject<HTMLDivElement | null>;
+  intersectionRef: React.RefObject<HTMLDivElement>;
 }): JSX.Element => {
   if (!selectedChat) {
     return (
@@ -43,6 +45,7 @@ const ChatArea = ({
         />
       </Card>
       <ScrollArea type="hover" scrollbars="vertical" ref={scrollRef}>
+        <div ref={intersectionRef}></div>
         <Card size="3" style={{ flexGrow: "1" }}>
           <Messages messages={messages} />
         </Card>

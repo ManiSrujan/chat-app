@@ -17,6 +17,7 @@ const MessageInput = ({
       <TextField.Root
         style={{ flexGrow: 1 }}
         autoComplete="off"
+        autoFocus
         placeholder="Enter message"
         size="3"
         onChange={handleInputChange}

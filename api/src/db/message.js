@@ -57,17 +57,23 @@ async function deleteMessage(messageId) {
   }
 }
 
-async function getAllMessage(chatId, sortDir = "asc") {
+async function getAllMessage(
+  chatId,
+  sortDir = "desc",
+  pageNumber = 1,
+  pageSize = 25,
+) {
   const client = createClient();
 
   try {
     await client.connect();
 
+    // TODO: Improve performance of this query by using indexes
     const result = await client.query(
       `SELECT message_id, message.user_id, user_name, content, created_at 
       FROM message JOIN appuser ON message.user_id = appuser.user_id 
-      WHERE chat_id = $1 ORDER BY message.created_at ${sortDir}`,
-      [chatId],
+      WHERE chat_id = $1 ORDER BY message.created_at ${sortDir} LIMIT $2 OFFSET $3`,
+      [chatId, pageSize, (pageNumber - 1) * pageSize],
     );
 
     return result.rows ?? [];

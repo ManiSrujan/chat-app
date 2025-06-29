@@ -2,9 +2,8 @@ import { useEffect, useRef } from "react";
 import websocket from "websocket";
 import { getEnvConfig } from "../../common/env-config/envConfig";
 import { ENV_CONFIG_KEY } from "../../common/env-config/constants";
-import { getItem } from "../../common/local-storage/localStorage";
-import { ILoginConfig, StorageKeys } from "../../common/types/storage.types";
 import { IMessage } from "./chat.types";
+import { getAccessToken } from "src/common/user/user";
 
 const useSocketCommunication = (
   addMessageToChat: (message: IMessage) => void,
@@ -13,11 +12,8 @@ const useSocketCommunication = (
 
   useEffect(() => {
     const WebSocketClient = websocket.w3cwebsocket;
-    const accessToken = getItem<ILoginConfig>(
-      StorageKeys.LOGIN_CONFIG,
-    )?.accessToken;
     client.current = new WebSocketClient(
-      `${getEnvConfig(ENV_CONFIG_KEY.WEBSOCKET)}?token=${accessToken}`,
+      `${getEnvConfig(ENV_CONFIG_KEY.WEBSOCKET)}?token=${getAccessToken()}`,
       "chat",
     );
 
