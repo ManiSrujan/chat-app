@@ -97,6 +97,14 @@ const useSignUp = () => {
     });
   }
 
+  function handleKeyPress(
+    event: React.KeyboardEvent<HTMLButtonElement | HTMLInputElement>,
+  ): void {
+    if (event.key === "Enter") {
+      onSubmit();
+    }
+  }
+
   return {
     formData,
     onChange,
@@ -106,6 +114,7 @@ const useSignUp = () => {
     setPasswordType,
     confirmPasswordType,
     setConfirmPasswordType,
+    handleKeyPress,
   };
 };
 

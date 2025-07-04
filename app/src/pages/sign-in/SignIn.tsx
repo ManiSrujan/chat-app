@@ -5,8 +5,15 @@ import useSignIn from "./useSignIn";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
 
 const SignIn = (): JSX.Element => {
-  const { formData, refs, onChange, onSubmit, passwordType, setPasswordType } =
-    useSignIn();
+  const {
+    formData,
+    refs,
+    onChange,
+    onSubmit,
+    passwordType,
+    setPasswordType,
+    handleKeyPress,
+  } = useSignIn();
 
   return (
     <Flex align="center" justify="center" height="100%">
@@ -47,7 +54,13 @@ const SignIn = (): JSX.Element => {
               }
               required
             />
-            <Button size="3" variant="solid" mt="3" onClick={onSubmit}>
+            <Button
+              size="3"
+              variant="solid"
+              mt="3"
+              onClick={onSubmit}
+              onKeyDown={handleKeyPress}
+            >
               Sign In
             </Button>
             <Link size="1" href={Routes.SignUp}>

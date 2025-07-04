@@ -14,6 +14,7 @@ const SignUp = (): JSX.Element => {
     setPasswordType,
     confirmPasswordType,
     setConfirmPasswordType,
+    handleKeyPress,
   } = useSignUp();
 
   return (
@@ -96,7 +97,13 @@ const SignUp = (): JSX.Element => {
               }
               required
             />
-            <Button size="3" variant="solid" mt="3" onClick={onSubmit}>
+            <Button
+              size="3"
+              variant="solid"
+              mt="3"
+              onClick={onSubmit}
+              onKeyDown={handleKeyPress}
+            >
               Sign Up
             </Button>
             <Flex justify="between">
