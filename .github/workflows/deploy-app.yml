@@ -33,9 +33,9 @@ jobs:
           cd app
           npm run build
 
-      - name: Copy prod-env-config.js to dist/public/env-config.js
+      - name: Copy env-config.js to dist/env-config.js
         run: |
-          cp app/public/prod-env-config.js app/dist/public/env-config.js
+          cp app/src/env/env-config.js app/dist/env-config.js
 
       - name: Sync to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
