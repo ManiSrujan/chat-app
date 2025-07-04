@@ -14,6 +14,7 @@ export interface IChat {
     content: string | null;
     created_at: string | null;
   };
+  _isTyping?: boolean;
 }
 
 export interface IMessage {

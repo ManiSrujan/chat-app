@@ -2,6 +2,7 @@ import { Card } from "@radix-ui/themes";
 import { IChat } from "../chat.types";
 import { getLoggedUserId } from "src/common/user/user";
 import UserCard from "@user-card";
+import Typing from "../messages/Typing";
 
 const getLastMessage = (chat: IChat) => {
   if (chat.last_message.message_id) {
@@ -16,9 +17,11 @@ const getLastMessage = (chat: IChat) => {
 const ChatListItem = ({
   chat,
   onSelect,
+  selectedChat,
 }: {
   chat: IChat;
   onSelect: (chat: IChat) => void;
+  selectedChat?: IChat;
 }) => {
   const chatUser = chat.users[0];
 
@@ -35,7 +38,13 @@ const ChatListItem = ({
       <UserCard
         firstName={chatUser.first_name}
         lastName={chatUser.last_name}
-        description={getLastMessage(chat)}
+        description={
+          chat._isTyping && selectedChat?.chat_id !== chat.chat_id ? (
+            <Typing show />
+          ) : (
+            getLastMessage(chat)
+          )
+        }
       />
     </Card>
   );

@@ -72,7 +72,7 @@ wsServer.on("request", async function handleWSRequest(request) {
           case "disconnect":
             delete webSocketConnections[data["userId"]];
             break;
-          case "message":
+          case "message": {
             const { srcUserId, chatId, message } = data;
             const usersOfChat = await getUsersOfChat(chatId);
             const targetUserId = usersOfChat.find(
@@ -98,6 +98,23 @@ wsServer.on("request", async function handleWSRequest(request) {
               );
             }
             break;
+          }
+          case "typing": {
+            const { srcUserId, chatId, isTyping } = data;
+            const usersOfChat = await getUsersOfChat(chatId);
+            const targetUserId = usersOfChat.find(
+              (user) => user.user_id !== srcUserId,
+            ).user_id;
+            const targetUserConnection = webSocketConnections[targetUserId];
+            if (targetUserConnection && targetUserConnection.connected) {
+              targetUserConnection.sendUTF(
+                JSON.stringify({
+                  type: "typing",
+                  data: { chatId, isTyping },
+                }),
+              );
+            }
+          }
         }
       }
     });

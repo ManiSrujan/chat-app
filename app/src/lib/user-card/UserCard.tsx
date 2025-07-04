@@ -1,4 +1,5 @@
 import { Avatar, Box, Flex, Text } from "@radix-ui/themes";
+import { ReactNode } from "react";
 import { getAvatarName, getFullName } from "src/common/user/user";
 
 const UserCard = ({
@@ -8,7 +9,7 @@ const UserCard = ({
 }: {
   firstName: string;
   lastName: string;
-  description?: string;
+  description?: ReactNode;
 }): JSX.Element => {
   return (
     <Flex gap="4" align="center">

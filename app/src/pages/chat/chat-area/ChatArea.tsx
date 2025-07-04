@@ -47,7 +47,7 @@ const ChatArea = ({
       <ScrollArea type="hover" scrollbars="vertical" ref={scrollRef}>
         <div ref={intersectionRef}></div>
         <Card size="3" style={{ height: "100%" }}>
-          <Messages messages={messages} />
+          <Messages messages={messages} showTyping={selectedChat?._isTyping} />
         </Card>
       </ScrollArea>
       <Card style={{ flexShrink: "0" }}>

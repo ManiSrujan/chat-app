@@ -12,6 +12,7 @@ const Chat = (): JSX.Element => {
     handleChatSelect,
     changeLastMessage,
     createChat,
+    addIsTypingToChat,
   } = useChatList();
   const {
     messages,
@@ -22,8 +23,13 @@ const Chat = (): JSX.Element => {
     handleKeyPress,
     handleSend,
     addMessageToChat,
+    scrollToBottom,
   } = useChatArea(selectedChat, changeLastMessage);
-  const { client } = useSocketCommunication(addMessageToChat);
+  const { client } = useSocketCommunication(
+    addMessageToChat,
+    addIsTypingToChat,
+    scrollToBottom,
+  );
 
   return (
     <Flex p="4" height="100vh" gap="2">
@@ -32,6 +38,7 @@ const Chat = (): JSX.Element => {
           chats={chats}
           onSelect={handleChatSelect}
           onUserSelect={createChat}
+          selectedChat={selectedChat}
         />
       </Box>
       <Box height="100%" flexGrow="1">
@@ -39,7 +46,7 @@ const Chat = (): JSX.Element => {
           selectedChat={selectedChat}
           messages={messages}
           input={input}
-          handleInputChange={(e) => handleInputChange(e.target.value)}
+          handleInputChange={(e) => handleInputChange(client, e.target.value)}
           handleSend={() => handleSend(client)}
           handleKeyPress={(e) => handleKeyPress(e, client)}
           scrollRef={scrollRef}

@@ -6,26 +6,56 @@ import { ENV_CONFIG_KEY } from "../../../common/env-config/constants";
 import websocket from "websocket";
 import { getLoggedUserId, getLoggedUserName } from "src/common/user/user";
 import useIntersectionObserver from "src/hooks/intersection-observer";
+import debounce from "src/common/utils/debounce";
+import throttle from "src/common/utils/throttle";
 
-interface IUseChatAreaReturn {
-  input: string;
-  messages: IMessage[];
-  scrollRef: React.MutableRefObject<HTMLDivElement | null>;
-  loading: boolean;
-  intersectionRef: React.RefObject<HTMLDivElement>;
-  handleInputChange: (value: string) => void;
-  handleSend: (client: websocket.w3cwebsocket | null) => void;
-  handleKeyPress: (
-    event: React.KeyboardEvent,
-    client: websocket.w3cwebsocket | null,
-  ) => void;
-  addMessageToChat: (message: IMessage) => void;
+function scroll(
+  scrollRef: React.MutableRefObject<HTMLDivElement | null>,
+  top: number = 0,
+) {
+  if (scrollRef.current) {
+    scrollRef.current.scrollTo({
+      top,
+      behavior: "auto",
+    });
+  }
 }
+
+function communicateIsTyping(
+  client: websocket.w3cwebsocket | null,
+  chatId: string,
+  isTyping: boolean,
+) {
+  if (!client) {
+    return;
+  }
+
+  client.send(
+    JSON.stringify({
+      type: "typing",
+      data: { srcUserId: getLoggedUserId(), chatId, isTyping },
+    }),
+  );
+}
+
+const makeIsTypingTrue = throttle(
+  (client: websocket.w3cwebsocket | null, chatId: string) => {
+    communicateIsTyping(client, chatId, true);
+  },
+  1000,
+);
+
+const makeIsTypingFalse = debounce(
+  (client: websocket.w3cwebsocket | null, chatId: string) => {
+    communicateIsTyping(client, chatId, false);
+  },
+  1000,
+);
 
 export const useChatArea = (
   selectedChat: IChat | undefined,
   changeLastMessage: (chatId: string, lastMessage: IMessage) => void,
-): IUseChatAreaReturn => {
+) => {
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [input, setInput] = useState("");
@@ -48,11 +78,13 @@ export const useChatArea = (
   });
 
   useMemo(
-    function resetMessages() {
+    function resetChatArea() {
+      setLoading(false);
       setMessages([]);
       setPageNumber(0);
+      setInput("");
     },
-    [selectedChat],
+    [selectedChat?.chat_id],
   );
 
   useEffect(() => {
@@ -78,29 +110,35 @@ export const useChatArea = (
 
   useEffect(() => {
     if (scrollRef.current && !loading) {
-      scrollRef.current.scrollTo({
-        top: scrollRef.current.scrollHeight - scrolledHeight.current,
-        behavior: "auto",
-      });
+      scroll(
+        scrollRef,
+        scrollRef.current.scrollHeight - scrolledHeight.current,
+      );
     }
   }, [loading]);
 
-  const handleInputChange = (value: string) => {
+  const handleInputChange = (
+    client: websocket.w3cwebsocket | null,
+    value: string,
+  ) => {
     setInput(value);
+    if (selectedChat) {
+      makeIsTypingTrue(client, selectedChat.chat_id);
+      makeIsTypingFalse(client, selectedChat.chat_id);
+    }
   };
+
+  function scrollToBottom() {
+    // setTimeout is added to ensure that the scroll happens after the DOM updates
+    setTimeout(() => {
+      scroll(scrollRef, scrollRef.current?.scrollHeight);
+    }, 0);
+  }
 
   const addMessageToChat = (message: IMessage) => {
     setMessages((prevMessages) => [...prevMessages, message]);
     changeLastMessage(message.chat_id, message);
-    // setTimeout is added to get new scrollHeight after addming message to DOM
-    setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTo({
-          top: scrollRef.current.scrollHeight,
-          behavior: "auto",
-        });
-      }
-    }, 0);
+    scrollToBottom();
   };
 
   const handleSend = (client: websocket.w3cwebsocket | null) => {
@@ -157,6 +195,7 @@ export const useChatArea = (
     handleSend,
     handleKeyPress,
     addMessageToChat,
+    scrollToBottom,
   };
 };
 
