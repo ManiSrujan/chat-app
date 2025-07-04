@@ -322,6 +322,11 @@ app.post("/auth/refresh", async function refreshUserToken(req, res) {
   }
 });
 
+// Health check endpoint
+app.get("/", (req, res) => {
+  res.send("OK");
+});
+
 server.listen(process.env.API_PORT, () => {
   console.log(`Server is running on port ${process.env.API_PORT}`);
 });
