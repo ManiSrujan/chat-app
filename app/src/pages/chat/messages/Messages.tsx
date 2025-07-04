@@ -2,6 +2,7 @@ import { Flex, Separator, Text } from "@radix-ui/themes";
 import { IMessage } from "../chat.types";
 import { getFormattedDate, getTimeString } from "src/common/date/date";
 import MessageItem from "./MessageItem";
+import Typing from "./Typing";
 
 const DateSeparator = ({ date }: { date: string }): JSX.Element => {
   return (
@@ -13,7 +14,13 @@ const DateSeparator = ({ date }: { date: string }): JSX.Element => {
   );
 };
 
-const Messages = ({ messages }: { messages: IMessage[] }): JSX.Element => {
+const Messages = ({
+  messages,
+  showTyping = false,
+}: {
+  messages: IMessage[];
+  showTyping?: boolean;
+}): JSX.Element => {
   if (!messages.length) {
     return (
       <Flex direction="column" height="100%" align="center" justify="center">
@@ -45,6 +52,7 @@ const Messages = ({ messages }: { messages: IMessage[] }): JSX.Element => {
           </Flex>
         );
       })}
+      <Typing show={showTyping} />
     </Flex>
   );
 };

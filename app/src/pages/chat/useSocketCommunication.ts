@@ -7,6 +7,8 @@ import { getAccessToken } from "src/common/user/user";
 
 const useSocketCommunication = (
   addMessageToChat: (message: IMessage) => void,
+  addIsTypingToChat: (chatId: string, isTyping: boolean) => void,
+  scrollToBottom: () => void,
 ): { client: websocket.w3cwebsocket | null } => {
   const client = useRef<websocket.w3cwebsocket | null>(null);
 
@@ -37,6 +39,10 @@ const useSocketCommunication = (
               user_name: data.user_name,
               chat_id: data.chat_id,
             });
+            break;
+          case "typing":
+            addIsTypingToChat(data.chatId, data.isTyping);
+            scrollToBottom();
             break;
         }
       }

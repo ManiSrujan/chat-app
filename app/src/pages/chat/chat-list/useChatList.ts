@@ -5,17 +5,7 @@ import { ENV_CONFIG_KEY } from "../../../common/env-config/constants";
 import { getLoggedUserId } from "src/common/user/user";
 import { IChat, IMessage } from "../chat.types";
 
-interface IUseChatListReturn {
-  chats: IChat[];
-  selectedChat: IChat | undefined;
-  loading: boolean;
-  error: string | null;
-  handleChatSelect: (chat: IChat) => void;
-  changeLastMessage: (chatId: string, lastMessage: IMessage) => void;
-  createChat: (srcUserId: string, targetUserId: string) => Promise<void>;
-}
-
-const useChatList = (): IUseChatListReturn => {
+const useChatList = () => {
   const [chats, setChats] = useState<IChat[]>([]);
   const [selectedChat, setSelectedChat] = useState<IChat>();
   const [loading, setLoading] = useState(true);
@@ -77,6 +67,28 @@ const useChatList = (): IUseChatListReturn => {
     }
   }
 
+  function addIsTypingToChat(chatId: string, isTyping: boolean) {
+    setSelectedChat((prevChat) =>
+      prevChat
+        ? {
+            ...prevChat,
+            _isTyping:
+              prevChat.chat_id === chatId ? isTyping : prevChat._isTyping,
+          }
+        : prevChat,
+    );
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat.chat_id === chatId
+          ? {
+              ...chat,
+              _isTyping: isTyping,
+            }
+          : chat,
+      ),
+    );
+  }
+
   return {
     chats,
     selectedChat,
@@ -85,6 +97,7 @@ const useChatList = (): IUseChatListReturn => {
     handleChatSelect,
     changeLastMessage,
     createChat,
+    addIsTypingToChat,
   };
 };
 

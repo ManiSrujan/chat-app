@@ -1,3 +1,21 @@
+@keyframes typing-animation {
+  0% {
+    margin-top: 10px;
+  }
+  25% {
+    margin-top: 0px;
+  }
+  50% {
+    margin-top: 10px;
+  }
+  75% {
+    margin-top: 0px;
+  }
+  100% {
+    margin-top: 10px;
+  }
+}
+
 .radix-themes {
   --cursor-button: pointer;
   --cursor-checkbox: pointer;
@@ -24,6 +42,31 @@
   &.dark {
     & .accent-background {
       background: var(--accent-1);
+    }
+  }
+
+  & .typing {
+    height: 20px;
+  }
+
+  & .typing span {
+    margin-top: 10px;
+    border-radius: 50%;
+    height: 6px;
+    width: 6px;
+    background-color: var(--accent-6);
+    animation-name: typing-animation;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+
+    &:nth-child(1) {
+      animation-delay: 0s;
+    }
+    &:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+    &:nth-child(3) {
+      animation-delay: 0.2s;
     }
   }
 }

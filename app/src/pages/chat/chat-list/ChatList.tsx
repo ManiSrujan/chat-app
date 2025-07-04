@@ -9,10 +9,12 @@ const ChatList = ({
   chats,
   onSelect,
   onUserSelect,
+  selectedChat,
 }: {
   chats: IChat[];
   onSelect: (chat: IChat) => void;
   onUserSelect: (srcUserId: string, targetUserId: string) => Promise<void>;
+  selectedChat?: IChat;
 }): JSX.Element => {
   return (
     <Card
@@ -41,7 +43,12 @@ const ChatList = ({
       >
         <Flex direction="column">
           {chats.map((chat) => (
-            <ChatListItem key={chat.chat_id} chat={chat} onSelect={onSelect} />
+            <ChatListItem
+              key={chat.chat_id}
+              chat={chat}
+              onSelect={onSelect}
+              selectedChat={selectedChat}
+            />
           ))}
         </Flex>
       </ScrollArea>

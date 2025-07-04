@@ -1,7 +1,10 @@
-function debounce<T>(callbackFn: (...args: any[]) => Promise<T>, delay = 200) {
+function debounce<T>(
+  callbackFn: (...args: any[]) => Promise<T> | T,
+  delay = 200,
+) {
   let timerId: NodeJS.Timeout | undefined;
 
-  return (...args: any[]): Promise<T> => {
+  return (...args: any[]): Promise<T> | T => {
     return new Promise((resolve, reject) => {
       if (timerId) {
         clearTimeout(timerId);
