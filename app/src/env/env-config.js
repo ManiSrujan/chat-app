@@ -1,5 +1,5 @@
 const ENV_CONFIG = {
-  API: "https://api.devcord.in",
+  API: "https://apii.devcord.in",
   WEBSOCKET: "wss://api.devcord.in",
 };
 
