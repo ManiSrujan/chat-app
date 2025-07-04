@@ -45,7 +45,7 @@ jobs:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
           SOURCE_DIR: app/dist
 
       - name: Invalidate CloudFront cache
@@ -55,4 +55,4 @@ jobs:
           PATHS: '/index.html /env-config.js'
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
