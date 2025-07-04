@@ -103,6 +103,12 @@ const useSignIn = () => {
     });
   }
 
+  function handleKeyPress(event: React.KeyboardEvent<HTMLButtonElement>): void {
+    if (event.key === "Enter") {
+      onSubmit();
+    }
+  }
+
   return {
     formData,
     onChange,
@@ -110,6 +116,7 @@ const useSignIn = () => {
     refs,
     passwordType,
     setPasswordType,
+    handleKeyPress,
   };
 };
 
