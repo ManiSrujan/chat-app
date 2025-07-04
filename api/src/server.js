@@ -24,11 +24,14 @@ import cors from "cors";
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(
-  cors({
-    origin: process.env.WEBSOCKET_ALLOWED_ORIGIN,
-  }),
-);
+
+if (process.env.WEBSOCKET_ALLOWED_ORIGIN) {
+  app.use(
+    cors({
+      origin: process.env.WEBSOCKET_ALLOWED_ORIGIN,
+    }),
+  );
+}
 
 const server = http.createServer(app);
 const WebSocketServer = websocket.server;
