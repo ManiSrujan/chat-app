@@ -3,6 +3,7 @@ import debounce from "src/common/utils/debounce";
 import restClient from "src/common/rest-client/restClient";
 import { ENV_CONFIG_KEY } from "src/common/env-config/constants";
 import { getEnvConfig } from "src/common/env-config/envConfig";
+import { getLoggedUserId } from "src/common/user/user";
 
 interface IUser {
   first_name: string;
@@ -31,7 +32,7 @@ const useUserSearch = () => {
 
   async function searchUsers(value: string) {
     const response = await fetchUsers(value);
-    setUsers(response);
+    setUsers(response.filter((user) => user.user_id !== getLoggedUserId()));
   }
 
   useEffect(() => {
