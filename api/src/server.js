@@ -28,7 +28,7 @@ app.use(express.json());
 if (process.env.WEBSOCKET_ALLOWED_ORIGIN) {
   app.use(
     cors({
-      origin: process.env.WEBSOCKET_ALLOWED_ORIGIN,
+      origin: process.env.WEBSOCKET_ALLOWED_ORIGIN?.split(","),
     }),
   );
 }
@@ -262,7 +262,8 @@ app.get(
 
 app.post("/auth/login", async function loginUser(req, res) {
   try {
-    const { username, password } = req.body;
+    const username = req.body.username.toLowerCase();
+    const password = req.body.password;
 
     // verify username and password
     const user = await verifyPassword(username, password);
@@ -303,7 +304,10 @@ app.post("/auth/login", async function loginUser(req, res) {
 
 app.post("/auth/signup", async function signUpUser(req, res) {
   try {
-    const { username, firstname, lastname, password } = req.body;
+    const username = req.body.username.toLowerCase();
+    const firstname = req.body.firstName.toLowerCase();
+    const lastname = req.body.lastName.toLowerCase();
+    const password = req.body.password;
 
     await signUp(username, firstname, lastname, password);
     res.sendStatus(201);
