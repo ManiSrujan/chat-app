@@ -28,7 +28,7 @@ app.use(express.json());
 if (process.env.WEBSOCKET_ALLOWED_ORIGIN) {
   app.use(
     cors({
-      origin: process.env.WEBSOCKET_ALLOWED_ORIGIN?.split(","),
+      origin: process.env.WEBSOCKET_ALLOWED_ORIGIN,
     }),
   );
 }
