@@ -3,6 +3,7 @@ import FormField from "@form-field";
 import useSignUp from "./useSignUp";
 import { Routes } from "src/common/constants";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
+import { Link as WouterLink } from "wouter";
 
 const SignUp = (): JSX.Element => {
   const {
@@ -110,9 +111,11 @@ const SignUp = (): JSX.Element => {
               <Link size="1" href="#">
                 Forgot Password?
               </Link>
-              <Link size="1" href={Routes.SignIn}>
-                Already have an account? Sign In
-              </Link>
+              <WouterLink href={Routes.SignIn}>
+                <Link size="1" href={Routes.SignIn}>
+                  Already have an account? Sign In
+                </Link>
+              </WouterLink>
             </Flex>
           </Flex>
         </Card>

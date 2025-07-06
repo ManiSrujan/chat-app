@@ -3,6 +3,7 @@ import { Box, Button, Card, Flex, Heading, Link } from "@radix-ui/themes";
 import { Routes } from "src/common/constants";
 import useSignIn from "./useSignIn";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
+import { Link as WouterLink } from "wouter";
 
 const SignIn = (): JSX.Element => {
   const {
@@ -63,9 +64,9 @@ const SignIn = (): JSX.Element => {
             >
               Sign In
             </Button>
-            <Link size="1" href={Routes.SignUp}>
-              Dont have an account? Sign Up
-            </Link>
+            <WouterLink href={Routes.SignUp}>
+              <Link size="1">Dont have an account? Sign Up</Link>
+            </WouterLink>
           </Flex>
         </Card>
       </Box>
