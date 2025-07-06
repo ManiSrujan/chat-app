@@ -160,6 +160,7 @@ export const useChatArea = (
           },
         }),
       );
+      communicateIsTyping(client, selectedChat.chat_id, false);
 
       const newMessage = {
         content: trimmedInput,
