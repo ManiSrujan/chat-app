@@ -31,7 +31,7 @@ const Messages = ({
     );
   }
   return (
-    <Flex direction="column" gap="4">
+    <Flex direction="column" gap={{ initial: "6", md: "4" }}>
       {messages.map((message, index) => {
         const messageDate = getFormattedDate(new Date(message.created_at));
         const messageTime = getTimeString(new Date(message.created_at));
@@ -44,7 +44,7 @@ const Messages = ({
           <Flex
             direction="column"
             key={message.message_id}
-            gap="4"
+            gap={{ initial: "6", md: "4" }}
             align="center"
           >
             {showDateSeparator ? <DateSeparator date={messageDate} /> : null}

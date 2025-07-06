@@ -5,7 +5,7 @@ import { getEnvConfig } from "../../../common/env-config/envConfig";
 import { ENV_CONFIG_KEY } from "../../../common/env-config/constants";
 import websocket from "websocket";
 import { getLoggedUserId, getLoggedUserName } from "src/common/user/user";
-import useIntersectionObserver from "src/hooks/intersection-observer";
+import useIntersectionObserver from "@/hooks/intersection-observer";
 import debounce from "src/common/utils/debounce";
 import throttle from "src/common/utils/throttle";
 

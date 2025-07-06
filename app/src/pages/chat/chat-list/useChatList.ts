@@ -31,7 +31,7 @@ const useChatList = () => {
     })();
   }, []);
 
-  const handleChatSelect = (chat: IChat) => {
+  const handleChatSelect = (chat: IChat | undefined) => {
     setSelectedChat(chat);
   };
 

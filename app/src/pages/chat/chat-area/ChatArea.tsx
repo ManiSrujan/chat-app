@@ -1,8 +1,9 @@
-import { Card, Flex, ScrollArea, Text } from "@radix-ui/themes";
+import { Card, Flex, IconButton, ScrollArea, Text } from "@radix-ui/themes";
 import { IChat, IMessage } from "../chat.types";
 import UserCard from "@user-card";
 import Messages from "../messages/Messages";
 import MessageInput from "./MessageInput";
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
 
 const ChatArea = ({
   selectedChat,
@@ -13,6 +14,8 @@ const ChatArea = ({
   handleKeyPress,
   scrollRef,
   intersectionRef,
+  isMobile,
+  resetChatSelection,
 }: {
   selectedChat: IChat | undefined;
   input: string;
@@ -22,6 +25,8 @@ const ChatArea = ({
   handleKeyPress: (event: React.KeyboardEvent) => void;
   scrollRef: React.MutableRefObject<HTMLDivElement | null>;
   intersectionRef: React.RefObject<HTMLDivElement>;
+  isMobile?: boolean;
+  resetChatSelection?: (chat: IChat | undefined) => void;
 }): JSX.Element => {
   if (!selectedChat) {
     return (
@@ -37,12 +42,23 @@ const ChatArea = ({
   return (
     <Flex direction="column" height="100%" gap="2">
       <Card style={{ flexShrink: "0" }}>
-        <UserCard
-          firstName={chatUser.first_name}
-          lastName={chatUser.last_name}
-          // TODO: Add online status functionality later
-          description="online"
-        />
+        <Flex align="center" gap="4">
+          {isMobile ? (
+            <IconButton
+              variant="ghost"
+              size="2"
+              onClick={() => resetChatSelection?.(undefined)}
+            >
+              <ArrowLeftIcon />
+            </IconButton>
+          ) : null}
+          <UserCard
+            firstName={chatUser.first_name}
+            lastName={chatUser.last_name}
+            // TODO: Add online status functionality later
+            description="online"
+          />
+        </Flex>
       </Card>
       <ScrollArea type="hover" scrollbars="vertical" ref={scrollRef}>
         <div ref={intersectionRef}></div>

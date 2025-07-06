@@ -25,8 +25,8 @@ const ChatMessageItem = ({
     <Flex
       style={{
         alignSelf: isLoggedUserMessage(message) ? "flex-end" : "flex-start",
-        maxWidth: "50%",
       }}
+      maxHeight={{ initial: "75%", md: "50%" }}
       align="end"
       gap="2"
     >
