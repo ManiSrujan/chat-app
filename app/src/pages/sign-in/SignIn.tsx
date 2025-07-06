@@ -18,7 +18,7 @@ const SignIn = (): JSX.Element => {
 
   return (
     <Flex align="center" justify="center" height="100%">
-      <Box width="400px">
+      <Box width="400px" p={{ initial: "4", md: "0" }}>
         <Card size="4">
           <Heading as="h3" mb="6">
             Sign In

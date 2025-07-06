@@ -4,6 +4,7 @@ import ChatArea from "./chat-area/ChatArea";
 import useChatList from "./chat-list/useChatList";
 import useChatArea from "./chat-area/useChatArea";
 import useSocketCommunication from "./useSocketCommunication";
+import useIsMobile from "@/hooks/orientation";
 
 const Chat = (): JSX.Element => {
   const {
@@ -30,8 +31,9 @@ const Chat = (): JSX.Element => {
     addIsTypingToChat,
     scrollToBottom,
   );
+  const { isMobile } = useIsMobile();
 
-  return (
+  return !isMobile ? (
     <Flex p="4" height="100vh" gap="2">
       <Box width="300px">
         <ChatList
@@ -54,6 +56,32 @@ const Chat = (): JSX.Element => {
         />
       </Box>
     </Flex>
+  ) : (
+    <Box width="100%" height="100vh" p={{ initial: "1", xs: "4" }}>
+      {!selectedChat ? (
+        <ChatList
+          chats={chats}
+          onSelect={handleChatSelect}
+          onUserSelect={createChat}
+          selectedChat={selectedChat}
+        />
+      ) : (
+        <>
+          <ChatArea
+            selectedChat={selectedChat}
+            messages={messages}
+            input={input}
+            handleInputChange={(e) => handleInputChange(client, e.target.value)}
+            handleSend={() => handleSend(client)}
+            handleKeyPress={(e) => handleKeyPress(e, client)}
+            scrollRef={scrollRef}
+            intersectionRef={intersectionRef}
+            resetChatSelection={handleChatSelect}
+            isMobile
+          />
+        </>
+      )}
+    </Box>
   );
 };
 
