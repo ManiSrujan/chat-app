@@ -34,7 +34,7 @@ const Chat = (): JSX.Element => {
   const { isMobile } = useIsMobile();
 
   return !isMobile ? (
-    <Flex p="4" height="100vh" gap="2">
+    <Flex p="4" height="100dvh" gap="2">
       <Box width="300px">
         <ChatList
           chats={chats}
@@ -57,7 +57,7 @@ const Chat = (): JSX.Element => {
       </Box>
     </Flex>
   ) : (
-    <Box width="100%" height="100vh" p={{ initial: "1", xs: "4" }}>
+    <Box width="100%" height="100dvh" p={{ initial: "1", xs: "4" }}>
       {!selectedChat ? (
         <ChatList
           chats={chats}
