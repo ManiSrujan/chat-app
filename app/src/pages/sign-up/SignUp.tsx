@@ -107,10 +107,12 @@ const SignUp = (): JSX.Element => {
             >
               Sign Up
             </Button>
-            <Flex justify="between">
-              <Link size="1" href="#">
-                Forgot Password?
-              </Link>
+            <Flex justify="between" align="center">
+              <WouterLink href="#">
+                <Link size="1" href="#">
+                  Forgot Password?
+                </Link>
+              </WouterLink>
               <WouterLink href={Routes.SignIn}>
                 <Link size="1" href={Routes.SignIn}>
                   Already have an account? Sign In
