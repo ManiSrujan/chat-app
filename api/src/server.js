@@ -28,7 +28,7 @@ app.use(express.json());
 if (process.env.WEBSOCKET_ALLOWED_ORIGIN) {
   app.use(
     cors({
-      origin: process.env.WEBSOCKET_ALLOWED_ORIGIN,
+      origin: process.env.WEBSOCKET_ALLOWED_ORIGIN?.split(",") || [],
     }),
   );
 }
@@ -42,7 +42,9 @@ const webSocketConnections = {};
 
 wsServer.on("request", async function handleWSRequest(request) {
   try {
-    if (request.origin !== process.env.WEBSOCKET_ALLOWED_ORIGIN) {
+    if (
+      !process.env.WEBSOCKET_ALLOWED_ORIGIN?.split(",").includes(request.origin)
+    ) {
       request.reject(403, "Origin not allowed");
       return;
     }
