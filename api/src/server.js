@@ -305,8 +305,8 @@ app.post("/auth/login", async function loginUser(req, res) {
 app.post("/auth/signup", async function signUpUser(req, res) {
   try {
     const username = req.body.username.toLowerCase();
-    const firstname = req.body.firstName.toLowerCase();
-    const lastname = req.body.lastName.toLowerCase();
+    const firstname = req.body.firstname.toLowerCase();
+    const lastname = req.body.lastname.toLowerCase();
     const password = req.body.password;
 
     await signUp(username, firstname, lastname, password);
